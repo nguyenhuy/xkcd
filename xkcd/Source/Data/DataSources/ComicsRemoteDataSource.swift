@@ -25,71 +25,77 @@ class ComicsRemoteDataSource : ComicsDataSource {
         self.init(withUrlSession: URLSession.shared, decoder: JSONDecoder(), apiHost: "https://xkcd.com", infoPath: "/info.0.json")
     }
     
-    func latestComicPublisher() -> AnyPublisher<Comic, Error> {
+    func latestComicPublisher() -> AnyPublisher<SingleFetchResult, Error> {
         guard let url = URL(string: apiHost + infoPath) else {
             fatalError("Failed to construct URL")
         }
         return urlSession.dataTaskPublisher(for: url)
             .map{ $0.data }
             .decode(type: Comic.self, decoder: decoder)
+            .map({ comic in
+                SingleFetchResult(comic: comic, nextFetchBookmark: ComicsRemoteDataSource.nextFetchBookmark(after: comic.id))
+            })
             .receive(on: RunLoop.main)
             .eraseToAnyPublisher()
     }
     
-    func comicPublisher(forComicWithId id: Int) -> AnyPublisher<Comic, Error> {
+    func comicPublisher(forComicWithId id: Int) -> AnyPublisher<SingleFetchResult, Error> {
         guard let url = URL(string: apiHost + "/\(id)" + infoPath) else {
             fatalError("Failed to construct URL")
         }
         return urlSession.dataTaskPublisher(for: url)
             .map{ $0.data }
             .decode(type: Comic.self, decoder: decoder)
+            .map({ comic in
+                SingleFetchResult(comic: comic, nextFetchBookmark: ComicsRemoteDataSource.nextFetchBookmark(after: comic.id))
+            })
             .receive(on: RunLoop.main)
             .eraseToAnyPublisher()
     }
     
     func comicsPublisher(withParams params: BatchFetchParams) -> AnyPublisher<BatchFetchResult, Error> {
-        let startingKey = params.startingKey
+        let startingId = params.bookmark
         var batchSize = params.batchSize
-        if (batchSize > startingKey + 1) {
-            batchSize = startingKey + 1
+        if (batchSize > startingId + 1) {
+            batchSize = startingId + 1
         }
         
         guard batchSize > 1 else {
-            return self.comicPublisher(forComicWithId: params.startingKey)
-                .map({ comic in
-                    BatchFetchResult(comics: [comic],
+            return self.comicPublisher(forComicWithId: startingId)
+                .map({ result in
+                    BatchFetchResult(comics: [result.comic],
                                      params: params,
-                                     nextBatchStartingKey: self.nextBatchStartingKey(withLastComicId: comic.id))
+                                     nextFetchBookmark: result.nextFetchBookmark)
                 })
                 .eraseToAnyPublisher()
         }
         
-        var publishers = [AnyPublisher<Comic, Error>]()
+        var publishers = [AnyPublisher<SingleFetchResult, Error>]()
         for i in 0..<batchSize {
-            let comicId = startingKey - i
+            let comicId = startingId - i
             publishers.append(self.comicPublisher(forComicWithId: comicId))
         }
         
         return Publishers.MergeMany(publishers)
             .collect()
-            .map({ comics in
-                let sortedComics = comics.sorted { a, b in
-                    a.id > b.id
+            .map({ results in
+                let sortedResults = results.sorted { a, b in
+                    a.comic.id > b.comic.id
                 }
                 
-                guard let last = sortedComics.last else {
+                guard let last = sortedResults.last else {
                     fatalError("Failed to fetch comics: no comic to merge")
                 }
                 
-                return BatchFetchResult(comics: sortedComics,
+                return BatchFetchResult(comics: sortedResults.map { $0.comic },
                                         params: params,
-                                        nextBatchStartingKey: self.nextBatchStartingKey(withLastComicId: last.id))
+                                        nextFetchBookmark: last.nextFetchBookmark)
             })
             .eraseToAnyPublisher()
     }
     
-    func nextBatchStartingKey(withLastComicId lastId: Int) -> Int {
-        return min(lastId - 1, 0)
+    static func nextFetchBookmark(after comicId: Int) -> Int {
+        return min(comicId - 1, 0)
     }
 
 }
