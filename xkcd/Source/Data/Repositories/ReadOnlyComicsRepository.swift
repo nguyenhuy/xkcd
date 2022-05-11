@@ -32,15 +32,15 @@ class ReadOnlyComicsRepository : ComicsRepository {
     }
     
     func prewarm() {
-        self.fetchFirstBatch()
+        self.fetchFirstBatch(forced: true)
     }
     
     func fetchNextBatch() {
         self.fetchBatch(withSize: ReadOnlyComicsRepository.NORMAL_PAGE_SIZE)
     }
     
-    private func fetchFirstBatch() {
-        if (self.isFetching()) {
+    private func fetchFirstBatch(forced: Bool = false) {
+        if (self.isFetching() && !forced) {
             return
         }
         
@@ -52,22 +52,24 @@ class ReadOnlyComicsRepository : ComicsRepository {
         self.currentFetch = self.remoteDataSource.latestComicPublisher()
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { [weak self] completion in
+                self?.currentFetch = nil
+                
                 switch completion {
                 case .finished:
-                    self?.fetchBatch(withSize: ReadOnlyComicsRepository.FIRST_PAGE_SIZE - 1)
+                    self?.fetchBatch(withSize: ReadOnlyComicsRepository.FIRST_PAGE_SIZE - 1,
+                                     forced: forced)
                     break
                 case .failure(let error):
                     self?.errors.append(error)
                 }
-                self?.currentFetch = nil
             }, receiveValue: { [weak self] result in
                 self?.comics.append(result.comic)
                 self?.nextFetchBookmark = result.nextFetchBookmark
         })
     }
     
-    private func fetchBatch(withSize size: Int) {
-        if (self.isFetching()) {
+    private func fetchBatch(withSize size: Int, forced: Bool = false) {
+        if (self.isFetching() && !forced) {
             return
         }
 
@@ -83,13 +85,14 @@ class ReadOnlyComicsRepository : ComicsRepository {
         self.currentFetch = self.remoteDataSource.comicsPublisher(withParams: params)
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { [weak self] completion in
+                self?.currentFetch = nil
+                
                 switch completion {
                 case .finished:
                     break
                 case .failure(let error):
                     self?.errors.append(error)
                 }
-                self?.currentFetch = nil
             }, receiveValue: { [weak self] result in
                 self?.comics.append(contentsOf: result.comics)
                 self?.nextFetchBookmark = result.nextFetchBookmark
