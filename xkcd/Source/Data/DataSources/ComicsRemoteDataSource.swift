@@ -68,7 +68,6 @@ class ComicsRemoteDataSource : ComicsDataSource {
                 let nextBookmark = currentBookmark.nextFetchBookmark(currentBatchCount: 1)
                 return SingleFetchResult(comic: comic, nextFetchBookmark: nextBookmark)
             })
-            .receive(on: RunLoop.main)
             .eraseToAnyPublisher()
     }
     
@@ -109,7 +108,6 @@ class ComicsRemoteDataSource : ComicsDataSource {
                 return BatchFetchResult(comics: sortedResults.map { $0.comic },
                                         nextFetchBookmark: last.nextFetchBookmark)
             })
-            .receive(on: RunLoop.main)
             .eraseToAnyPublisher()
     }
 }
