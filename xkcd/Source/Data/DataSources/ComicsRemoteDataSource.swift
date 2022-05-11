@@ -56,8 +56,8 @@ class ComicsRemoteDataSource : ComicsDataSource {
     func comicsPublisher(withParams params: BatchFetchParams) -> AnyPublisher<BatchFetchResult, Error> {
         let startingId = params.bookmark
         var batchSize = params.batchSize
-        if (batchSize > startingId + 1) {
-            batchSize = startingId + 1
+        if (batchSize > startingId) {
+            batchSize = startingId
         }
         
         guard batchSize > 1 else {
@@ -95,7 +95,7 @@ class ComicsRemoteDataSource : ComicsDataSource {
     }
     
     static func nextFetchBookmark(after comicId: Int) -> Int {
-        return min(comicId - 1, 0)
+        return min(comicId - 1, 1)
     }
 
 }
