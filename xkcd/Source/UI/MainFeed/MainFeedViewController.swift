@@ -29,7 +29,7 @@ class MainFeedViewController: UIViewController {
         self.viewModel.comicsRepository.comicsPublisher
             .receive(on: RunLoop.main)
             .sink { (comics) in
-                print(comics)
+                print("Huy:\(comics.map { $0.id })")
             }.store(in: &cancellables)
     }
 
