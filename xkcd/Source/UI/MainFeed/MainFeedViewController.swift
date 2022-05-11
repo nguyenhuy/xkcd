@@ -23,6 +23,9 @@ class MainFeedViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.viewModel.comicsRepository.fetchNextBatch()
+        
         self.viewModel.comicsRepository.comicsPublisher
             .receive(on: RunLoop.main)
             .sink { (comics) in
