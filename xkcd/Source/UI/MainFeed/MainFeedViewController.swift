@@ -6,9 +6,11 @@
 //
 
 import UIKit
+import Combine
 
 class MainFeedViewController: UIViewController {
     let viewModel: MainFeedViewModel
+    private var cancellables: Set<AnyCancellable> = []
     
     init(viewModel: MainFeedViewModel) {
         self.viewModel = viewModel
@@ -21,7 +23,11 @@ class MainFeedViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        self.viewModel.comicsRepository.comicsPublisher
+            .receive(on: RunLoop.main)
+            .sink { (comics) in
+                print(comics)
+            }.store(in: &cancellables)
     }
 
 
