@@ -20,21 +20,11 @@ struct BatchFetchParams {
     let batchSize: Int
 }
 
-/// The result of a comic fetch
-protocol FetchResult {
-    
-    /// The bookmark to be used to fetch the next result(s)
-    /// No next result available if nil
-    var nextFetchBookmark: FetchBookmark? { get }
-}
-
 /// The result of a batch fetch
-struct BatchFetchResult: FetchResult {
+struct BatchFetchResult {
+    
     /// The comics
     let comics: [Comic]
-    
-    /// Params used for this fetch
-    let params: BatchFetchParams
     
     /// The bookmark to be used to fetch the next batch
     /// No next batch available if nil
@@ -42,7 +32,7 @@ struct BatchFetchResult: FetchResult {
 }
 
 /// The result of a single comic fetch
-struct SingleFetchResult: FetchResult {
+struct SingleFetchResult {
     
     /// The comic
     let comic: Comic

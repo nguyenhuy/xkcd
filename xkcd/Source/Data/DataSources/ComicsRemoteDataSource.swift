@@ -84,7 +84,6 @@ class ComicsRemoteDataSource : ComicsDataSource {
             return self.comicPublisher(forComicWithId: startingId)
                 .map({ result in
                     BatchFetchResult(comics: [result.comic],
-                                     params: params,
                                      nextFetchBookmark: result.nextFetchBookmark)
                 })
                 .eraseToAnyPublisher()
@@ -108,9 +107,9 @@ class ComicsRemoteDataSource : ComicsDataSource {
                 }
                 
                 return BatchFetchResult(comics: sortedResults.map { $0.comic },
-                                        params: params,
                                         nextFetchBookmark: last.nextFetchBookmark)
             })
+            .receive(on: RunLoop.main)
             .eraseToAnyPublisher()
     }
 }
