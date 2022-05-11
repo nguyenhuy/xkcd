@@ -29,7 +29,7 @@ struct xkcdFetchBookmark : FetchBookmark {
 }
 
 class ComicsRemoteDataSource : ComicsDataSource {
-    var urlSession: URLSession
+    let urlSession: URLSession
     let decoder: JSONDecoder
     let apiHost: String
     let infoPath: String
