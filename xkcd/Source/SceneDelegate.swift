@@ -18,6 +18,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         
         let mainFeedRepository = ReadOnlyComicsRepository()
+        mainFeedRepository.prewarm()
+        
         let mainFeedViewModel = MainFeedViewModel(comicsRepository: mainFeedRepository)
         let mainFeedViewController = MainFeedViewController(viewModel: mainFeedViewModel)
         
