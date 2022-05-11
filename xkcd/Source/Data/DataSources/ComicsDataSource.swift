@@ -8,11 +8,13 @@
 import Foundation
 import Combine
 
+protocol FetchBookmark {}
+
 /// Params for fetching next comics
 struct BatchFetchParams {
     
-    /// The bookmark for this page
-    let bookmark: Int
+    /// The bookmark for this batch
+    let bookmark: FetchBookmark
     
     /// How many comics to fetch?
     let batchSize: Int
@@ -22,7 +24,8 @@ struct BatchFetchParams {
 protocol FetchResult {
     
     /// The bookmark to be used to fetch the next result(s)
-    var nextFetchBookmark: Int { get }
+    /// No next result available if nil
+    var nextFetchBookmark: FetchBookmark? { get }
 }
 
 /// The result of a batch fetch
@@ -34,7 +37,8 @@ struct BatchFetchResult: FetchResult {
     let params: BatchFetchParams
     
     /// The bookmark to be used to fetch the next batch
-    let nextFetchBookmark: Int
+    /// No next batch available if nil
+    let nextFetchBookmark: FetchBookmark?
 }
 
 /// The result of a single comic fetch
@@ -44,7 +48,8 @@ struct SingleFetchResult: FetchResult {
     let comic: Comic
     
     /// The bookmark to be used to fetch the next comic(s)
-    let nextFetchBookmark: Int
+    /// No next batch available if nil
+    let nextFetchBookmark: FetchBookmark?
 }
 
 /// A data source for comics, can be remote or local

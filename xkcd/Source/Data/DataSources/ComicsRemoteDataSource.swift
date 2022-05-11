@@ -8,6 +8,26 @@
 import Foundation
 import Combine
 
+struct xkcdFetchBookmark : FetchBookmark {
+    static let MIN = 1
+
+    let rawValue: Int
+    
+    func nextFetchBookmark(currentBatchCount: Int) -> FetchBookmark? {
+        let nextRawValue = self.rawValue - currentBatchCount
+        guard nextRawValue >= xkcdFetchBookmark.MIN else {
+            // We've ran out of comics
+            return nil
+        }
+        
+        return xkcdFetchBookmark(rawValue: nextRawValue)
+    }
+    
+    func validBatchSize(requestedBatchSize: Int) -> Int {
+        return min(self.rawValue - xkcdFetchBookmark.MIN + 1, requestedBatchSize)
+    }
+}
+
 class ComicsRemoteDataSource : ComicsDataSource {
     var urlSession: URLSession
     let decoder: JSONDecoder
@@ -27,38 +47,38 @@ class ComicsRemoteDataSource : ComicsDataSource {
     
     func latestComicPublisher() -> AnyPublisher<SingleFetchResult, Error> {
         guard let url = URL(string: apiHost + infoPath) else {
-            fatalError("Failed to construct URL")
+            return Fail(error: URLError(.badServerResponse)).eraseToAnyPublisher()
         }
-        return urlSession.dataTaskPublisher(for: url)
-            .map{ $0.data }
-            .decode(type: Comic.self, decoder: decoder)
-            .map({ comic in
-                SingleFetchResult(comic: comic, nextFetchBookmark: ComicsRemoteDataSource.nextFetchBookmark(after: comic.id))
-            })
-            .receive(on: RunLoop.main)
-            .eraseToAnyPublisher()
+        return self.comicPublisher(forUrl: url)
     }
     
     func comicPublisher(forComicWithId id: Int) -> AnyPublisher<SingleFetchResult, Error> {
         guard let url = URL(string: apiHost + "/\(id)" + infoPath) else {
-            fatalError("Failed to construct URL")
+            return Fail(error: URLError(.badServerResponse)).eraseToAnyPublisher()
         }
+        return self.comicPublisher(forUrl: url)
+    }
+    
+    private func comicPublisher(forUrl url: URL) -> AnyPublisher<SingleFetchResult, Error> {
         return urlSession.dataTaskPublisher(for: url)
             .map{ $0.data }
             .decode(type: Comic.self, decoder: decoder)
             .map({ comic in
-                SingleFetchResult(comic: comic, nextFetchBookmark: ComicsRemoteDataSource.nextFetchBookmark(after: comic.id))
+                let currentBookmark = xkcdFetchBookmark(rawValue: comic.id)
+                let nextBookmark = currentBookmark.nextFetchBookmark(currentBatchCount: 1)
+                return SingleFetchResult(comic: comic, nextFetchBookmark: nextBookmark)
             })
             .receive(on: RunLoop.main)
             .eraseToAnyPublisher()
     }
     
     func comicsPublisher(withParams params: BatchFetchParams) -> AnyPublisher<BatchFetchResult, Error> {
-        let startingId = params.bookmark
-        var batchSize = params.batchSize
-        if (batchSize > startingId) {
-            batchSize = startingId
+        guard let bookmark = params.bookmark as? xkcdFetchBookmark else {
+            return Fail(error: CancellationError()).eraseToAnyPublisher()
         }
+        
+        let startingId = bookmark.rawValue
+        let batchSize = bookmark.validBatchSize(requestedBatchSize: params.batchSize)
         
         guard batchSize > 1 else {
             return self.comicPublisher(forComicWithId: startingId)
@@ -78,13 +98,13 @@ class ComicsRemoteDataSource : ComicsDataSource {
         
         return Publishers.MergeMany(publishers)
             .collect()
-            .map({ results in
+            .tryMap({ results in
                 let sortedResults = results.sorted { a, b in
                     a.comic.id > b.comic.id
                 }
                 
-                guard let last = sortedResults.last else {
-                    fatalError("Failed to fetch comics: no comic to merge")
+                guard results.count == params.batchSize, let last = sortedResults.last else {
+                    throw URLError(.badServerResponse)
                 }
                 
                 return BatchFetchResult(comics: sortedResults.map { $0.comic },
@@ -93,9 +113,4 @@ class ComicsRemoteDataSource : ComicsDataSource {
             })
             .eraseToAnyPublisher()
     }
-    
-    static func nextFetchBookmark(after comicId: Int) -> Int {
-        return min(comicId - 1, 1)
-    }
-
 }
