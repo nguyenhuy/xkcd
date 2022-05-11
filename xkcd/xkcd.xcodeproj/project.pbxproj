@@ -18,6 +18,8 @@
 		05E9C85A282B207000698276 /* Comic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E9C859282B207000698276 /* Comic.swift */; };
 		05E9C85F282B21AA00698276 /* ComicsRemoteDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E9C85E282B21AA00698276 /* ComicsRemoteDataSource.swift */; };
 		05E9C861282B224500698276 /* ComicsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E9C860282B224500698276 /* ComicsDataSource.swift */; };
+		05E9C864282B431C00698276 /* ComicsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E9C863282B431C00698276 /* ComicsRepository.swift */; };
+		05E9C866282B49EE00698276 /* ReadOnlyComicsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E9C865282B49EE00698276 /* ReadOnlyComicsRepository.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +55,8 @@
 		05E9C859282B207000698276 /* Comic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comic.swift; sourceTree = "<group>"; };
 		05E9C85E282B21AA00698276 /* ComicsRemoteDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComicsRemoteDataSource.swift; sourceTree = "<group>"; };
 		05E9C860282B224500698276 /* ComicsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComicsDataSource.swift; sourceTree = "<group>"; };
+		05E9C863282B431C00698276 /* ComicsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComicsRepository.swift; sourceTree = "<group>"; };
+		05E9C865282B49EE00698276 /* ReadOnlyComicsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadOnlyComicsRepository.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -150,6 +154,7 @@
 		05E9C858282AE56800698276 /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				05E9C862282B427700698276 /* Repositories */,
 				05E9C85D282B216E00698276 /* DataSources */,
 				05E9C85B282B214A00698276 /* Models */,
 			);
@@ -175,10 +180,19 @@
 		05E9C85D282B216E00698276 /* DataSources */ = {
 			isa = PBXGroup;
 			children = (
-				05E9C85E282B21AA00698276 /* ComicsRemoteDataSource.swift */,
 				05E9C860282B224500698276 /* ComicsDataSource.swift */,
+				05E9C85E282B21AA00698276 /* ComicsRemoteDataSource.swift */,
 			);
 			path = DataSources;
+			sourceTree = "<group>";
+		};
+		05E9C862282B427700698276 /* Repositories */ = {
+			isa = PBXGroup;
+			children = (
+				05E9C863282B431C00698276 /* ComicsRepository.swift */,
+				05E9C865282B49EE00698276 /* ReadOnlyComicsRepository.swift */,
+			);
+			path = Repositories;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -314,7 +328,9 @@
 				05E9C85F282B21AA00698276 /* ComicsRemoteDataSource.swift in Sources */,
 				052F9AA9282AE36200D62F10 /* MainFeedViewController.swift in Sources */,
 				05E9C85A282B207000698276 /* Comic.swift in Sources */,
+				05E9C864282B431C00698276 /* ComicsRepository.swift in Sources */,
 				052F9AA5282AE36200D62F10 /* AppDelegate.swift in Sources */,
+				05E9C866282B49EE00698276 /* ReadOnlyComicsRepository.swift in Sources */,
 				05E9C861282B224500698276 /* ComicsDataSource.swift in Sources */,
 				052F9AA7282AE36200D62F10 /* SceneDelegate.swift in Sources */,
 			);
