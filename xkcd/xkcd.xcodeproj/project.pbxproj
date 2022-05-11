@@ -20,6 +20,7 @@
 		05E9C861282B224500698276 /* ComicsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E9C860282B224500698276 /* ComicsDataSource.swift */; };
 		05E9C864282B431C00698276 /* ComicsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E9C863282B431C00698276 /* ComicsRepository.swift */; };
 		05E9C866282B49EE00698276 /* ReadOnlyComicsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E9C865282B49EE00698276 /* ReadOnlyComicsRepository.swift */; };
+		05E9C868282B7BC000698276 /* MainFeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E9C867282B7BC000698276 /* MainFeedViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +58,7 @@
 		05E9C860282B224500698276 /* ComicsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComicsDataSource.swift; sourceTree = "<group>"; };
 		05E9C863282B431C00698276 /* ComicsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComicsRepository.swift; sourceTree = "<group>"; };
 		05E9C865282B49EE00698276 /* ReadOnlyComicsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadOnlyComicsRepository.swift; sourceTree = "<group>"; };
+		05E9C867282B7BC000698276 /* MainFeedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainFeedViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -172,6 +174,7 @@
 		05E9C85C282B215200698276 /* MainFeed */ = {
 			isa = PBXGroup;
 			children = (
+				05E9C867282B7BC000698276 /* MainFeedViewModel.swift */,
 				052F9AA8282AE36200D62F10 /* MainFeedViewController.swift */,
 			);
 			path = MainFeed;
@@ -331,6 +334,7 @@
 				05E9C864282B431C00698276 /* ComicsRepository.swift in Sources */,
 				052F9AA5282AE36200D62F10 /* AppDelegate.swift in Sources */,
 				05E9C866282B49EE00698276 /* ReadOnlyComicsRepository.swift in Sources */,
+				05E9C868282B7BC000698276 /* MainFeedViewModel.swift in Sources */,
 				05E9C861282B224500698276 /* ComicsDataSource.swift in Sources */,
 				052F9AA7282AE36200D62F10 /* SceneDelegate.swift in Sources */,
 			);
