@@ -54,7 +54,7 @@ class RemoteComicDataSourceTests: XCTestCase {
         XCTAssertEqual(result.comic.id, expectedComicId)
     }
     
-    func testFetchComics() throws {
+    func testFetchedComicsAreSorted() throws {
         let startingId = 1000
         let batchSize = 10
         for i in 0..<batchSize {
@@ -77,14 +77,69 @@ class RemoteComicDataSourceTests: XCTestCase {
         }
     }
     
-    // Test bookmark with different scenarios
+    func testFetchFewerComicsThanAvailable() throws {
+        let startingId = 20
+        let batchSize = 10
+        for i in 0..<batchSize {
+            let id = startingId - i
+            let url = URL(string: apiHost + "/\(id)" + infoPath)!
+            let publisher = networkClient.mockPublisher(for: id)
+            networkClient.returnedPublishers[url] = publisher
+        }
+        
+        let params = BatchFetchParams(bookmark: xkcdFetchBookmark(rawValue: startingId),
+                                      batchSize: batchSize)
+        let result = try waitForPublisher(publisher: dataSource.comics(withParams: params))
+        let returnedIds = result.comics.map() { $0.id }
+        
+        XCTAssertEqual(returnedIds.count, batchSize)
+        XCTAssertNotNil(result.nextFetchBookmark)
+    }
     
+    func testFetchAllRemainingComics() throws {
+        let startingId = 5
+        let batchSize = 5
+        for i in 0..<batchSize {
+            let id = startingId - i
+            let url = URL(string: apiHost + "/\(id)" + infoPath)!
+            let publisher = networkClient.mockPublisher(for: id)
+            networkClient.returnedPublishers[url] = publisher
+        }
+        
+        let params = BatchFetchParams(bookmark: xkcdFetchBookmark(rawValue: startingId),
+                                      batchSize: batchSize)
+        let result = try waitForPublisher(publisher: dataSource.comics(withParams: params))
+        let returnedIds = result.comics.map() { $0.id }
+        
+        XCTAssertEqual(returnedIds.count, batchSize)
+        XCTAssertNil(result.nextFetchBookmark)
+    }
+    
+    func testFetchMoreComicsThanAvailable() throws {
+        let startingId = 5
+        let givenBatchSize = 10
+        let expectedBatchSize = 5
+        for i in 0..<expectedBatchSize {
+            let id = startingId - i
+            let url = URL(string: apiHost + "/\(id)" + infoPath)!
+            let publisher = networkClient.mockPublisher(for: id)
+            networkClient.returnedPublishers[url] = publisher
+        }
+        
+        let params = BatchFetchParams(bookmark: xkcdFetchBookmark(rawValue: startingId),
+                                      batchSize: givenBatchSize)
+        let result = try waitForPublisher(publisher: dataSource.comics(withParams: params))
+        let returnedIds = result.comics.map() { $0.id }
+        
+        XCTAssertEqual(returnedIds.count, expectedBatchSize)
+        XCTAssertNil(result.nextFetchBookmark)
+    }
     
     private func waitForPublisher<T: Publisher>(publisher: T) throws -> T.Output {
         var expectedResult: T.Output?
         let expectation = self.expectation(description: "Awaiting result")
         
-        let cancellable = publisher.sink { _ in
+        let cancellable = publisher.print().sink { _ in
             expectation.fulfill()
         } receiveValue: { result in
             expectedResult = result
