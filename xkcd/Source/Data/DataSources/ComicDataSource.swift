@@ -48,10 +48,6 @@ protocol ComicDataSource {
     /// - Returns: A publisher that delivers the most recent comic
     func latestComic() -> AnyPublisher<SingleFetchResult, Error>
     
-    /// - Returns: A publisher that delivers the comic with that id
-    /// - Parameter id: The comic id
-    func comic(withId id: Int) -> AnyPublisher<SingleFetchResult, Error>
-    
     /// Provides a publisher that can fetch multiple comics at onces
     /// - Returns: A publisher that delivers a batch of comics, as well as the starting key for the next batch.
     /// - Parameter params: Parameters for the fetch.

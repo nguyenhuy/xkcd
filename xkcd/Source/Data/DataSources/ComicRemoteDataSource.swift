@@ -49,26 +49,7 @@ class ComicRemoteDataSource : ComicDataSource {
         guard let url = URL(string: apiHost + infoPath) else {
             return Fail(error: URLError(.badServerResponse)).eraseToAnyPublisher()
         }
-        return self.comicPublisher(forUrl: url)
-    }
-    
-    func comic(withId id: Int) -> AnyPublisher<SingleFetchResult, Error> {
-        guard let url = URL(string: apiHost + "/\(id)" + infoPath) else {
-            return Fail(error: URLError(.badServerResponse)).eraseToAnyPublisher()
-        }
-        return self.comicPublisher(forUrl: url)
-    }
-    
-    private func comicPublisher(forUrl url: URL) -> AnyPublisher<SingleFetchResult, Error> {
-        return urlSession.dataTaskPublisher(for: url)
-            .map{ $0.data }
-            .decode(type: Comic.self, decoder: decoder)
-            .map({ comic in
-                let currentBookmark = xkcdFetchBookmark(rawValue: comic.id)
-                let nextBookmark = currentBookmark.nextFetchBookmark(currentBatchCount: 1)
-                return SingleFetchResult(comic: comic, nextFetchBookmark: nextBookmark)
-            })
-            .eraseToAnyPublisher()
+        return self.comic(forUrl: url)
     }
     
     func comics(withParams params: BatchFetchParams) -> AnyPublisher<BatchFetchResult, Error> {
@@ -107,6 +88,25 @@ class ComicRemoteDataSource : ComicDataSource {
                 
                 return BatchFetchResult(comics: sortedResults.map { $0.comic },
                                         nextFetchBookmark: last.nextFetchBookmark)
+            })
+            .eraseToAnyPublisher()
+    }
+    
+    private func comic(withId id: Int) -> AnyPublisher<SingleFetchResult, Error> {
+        guard let url = URL(string: apiHost + "/\(id)" + infoPath) else {
+            return Fail(error: URLError(.badServerResponse)).eraseToAnyPublisher()
+        }
+        return self.comic(forUrl: url)
+    }
+    
+    private func comic(forUrl url: URL) -> AnyPublisher<SingleFetchResult, Error> {
+        return urlSession.dataTaskPublisher(for: url)
+            .map{ $0.data }
+            .decode(type: Comic.self, decoder: decoder)
+            .map({ comic in
+                let currentBookmark = xkcdFetchBookmark(rawValue: comic.id)
+                let nextBookmark = currentBookmark.nextFetchBookmark(currentBatchCount: 1)
+                return SingleFetchResult(comic: comic, nextFetchBookmark: nextBookmark)
             })
             .eraseToAnyPublisher()
     }
