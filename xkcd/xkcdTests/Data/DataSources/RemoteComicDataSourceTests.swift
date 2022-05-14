@@ -49,22 +49,50 @@ class RemoteComicDataSourceTests: XCTestCase {
         let publisher = networkClient.mockPublisher(for: expectedComicId)
         networkClient.returnedPublishers[url] = publisher
         
-        var expectedResult: SingleFetchResult?
+        let result = try waitForPublisher(publisher: dataSource.latestComic())
+
+        XCTAssertEqual(result.comic.id, expectedComicId)
+    }
+    
+    func testFetchComics() throws {
+        let startingId = 1000
+        let batchSize = 10
+        for i in 0..<batchSize {
+            let id = startingId - i
+            let url = URL(string: apiHost + "/\(id)" + infoPath)!
+            let publisher = networkClient.mockPublisher(for: id)
+            networkClient.returnedPublishers[url] = publisher
+        }
         
+        let params = BatchFetchParams(bookmark: xkcdFetchBookmark(rawValue: startingId),
+                                      batchSize: batchSize)
+        let result = try waitForPublisher(publisher: dataSource.comics(withParams: params))
+        let returnedIds = result.comics.map() { $0.id }
+        
+        XCTAssertEqual(returnedIds.count, batchSize)
+        XCTAssertEqual(returnedIds.first, startingId)
+        // Test that the returned comics are sorted
+        for i in 1..<batchSize {
+            XCTAssert(returnedIds[i - 1] > returnedIds[i])
+        }
+    }
+    
+    // Test bookmark with different scenarios
+    
+    
+    private func waitForPublisher<T: Publisher>(publisher: T) throws -> T.Output {
+        var expectedResult: T.Output?
         let expectation = self.expectation(description: "Awaiting result")
-        let cancellable = dataSource.latestComic().sink { _ in
+        
+        let cancellable = publisher.sink { _ in
             expectation.fulfill()
         } receiveValue: { result in
             expectedResult = result
         }
 
-        
         waitForExpectations(timeout: 1)
         cancellable.cancel()
         
-        let unwrappedResult = try XCTUnwrap(expectedResult)
-        XCTAssertEqual(unwrappedResult.comic.id, expectedComicId)
+        return try XCTUnwrap(expectedResult)
     }
-    
-    
 }
