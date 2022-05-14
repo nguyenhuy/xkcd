@@ -82,7 +82,7 @@ class RemoteComicDataSource : ComicDataSource {
                     a.comic.id > b.comic.id
                 }
                 
-                guard results.count == params.batchSize, let last = sortedResults.last else {
+                guard results.count == batchSize, let last = sortedResults.last else {
                     throw URLError(.badServerResponse)
                 }
                 
