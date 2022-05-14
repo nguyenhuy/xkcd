@@ -1,5 +1,5 @@
 //
-//  ComicsDataSource.swift
+//  ComicDataSource.swift
 //  xkcd
 //
 //  Created by Thanh Huy Nguyen on 5/10/22.
@@ -43,17 +43,17 @@ struct SingleFetchResult {
 }
 
 /// A data source for comics, can be remote or local
-protocol ComicsDataSource {
+protocol ComicDataSource {
     
     /// - Returns: A publisher that delivers the most recent comic
-    func latestComicPublisher() -> AnyPublisher<SingleFetchResult, Error>
+    func latestComic() -> AnyPublisher<SingleFetchResult, Error>
     
     /// - Returns: A publisher that delivers the comic with that id
     /// - Parameter id: The comic id
-    func comicPublisher(forComicWithId id: Int) -> AnyPublisher<SingleFetchResult, Error>
+    func comic(withId id: Int) -> AnyPublisher<SingleFetchResult, Error>
     
     /// Provides a publisher that can fetch multiple comics at onces
     /// - Returns: A publisher that delivers a batch of comics, as well as the starting key for the next batch.
     /// - Parameter params: Parameters for the fetch.
-    func comicsPublisher(withParams params: BatchFetchParams) -> AnyPublisher<BatchFetchResult, Error>
+    func comics(withParams params: BatchFetchParams) -> AnyPublisher<BatchFetchResult, Error>
 }

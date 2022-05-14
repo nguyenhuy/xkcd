@@ -24,14 +24,14 @@ class MainFeedViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let repository = self.viewModel.comicsRepository
+        let repository = self.viewModel.comicRepository
         repository.fetchNextBatch()
 
         repository.comicsPublisher
             .debounce(for: .seconds(5), scheduler: DispatchQueue.main)
             .sink { [weak self] (comics) in
                 print("Huy:\(comics.map { $0.id })")
-                self?.viewModel.comicsRepository.fetchNextBatch()
+                self?.viewModel.comicRepository.fetchNextBatch()
             }.store(in: &cancellables)
     }
 

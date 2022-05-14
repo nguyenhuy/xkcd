@@ -17,10 +17,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         
-        let mainFeedRepository = ReadOnlyComicsRepository()
+        let mainFeedRepository = ReadOnlyComicRepository()
         mainFeedRepository.prewarm()
         
-        let mainFeedViewModel = MainFeedViewModel(comicsRepository: mainFeedRepository)
+        let mainFeedViewModel = MainFeedViewModel(comicRepository: mainFeedRepository)
         let mainFeedViewController = MainFeedViewController(viewModel: mainFeedViewModel)
         
         guard let windowScene = (scene as? UIWindowScene) else { return }

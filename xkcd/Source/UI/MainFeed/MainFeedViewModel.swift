@@ -8,9 +8,9 @@
 import Foundation
 
 class MainFeedViewModel {
-    let comicsRepository: ComicsRepository
+    let comicRepository: ComicRepository
     
-    init(comicsRepository: ComicsRepository) {
-        self.comicsRepository = comicsRepository
+    init(comicRepository: ComicRepository) {
+        self.comicRepository = comicRepository
     }
 }

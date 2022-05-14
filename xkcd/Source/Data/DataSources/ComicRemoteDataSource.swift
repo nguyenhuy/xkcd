@@ -1,5 +1,5 @@
 //
-//  ComicsRemoteDataSource.swift
+//  ComicRemoteDataSource.swift
 //  xkcd
 //
 //  Created by Thanh Huy Nguyen on 5/10/22.
@@ -28,7 +28,7 @@ struct xkcdFetchBookmark : FetchBookmark {
     }
 }
 
-class ComicsRemoteDataSource : ComicsDataSource {
+class ComicRemoteDataSource : ComicDataSource {
     let urlSession: URLSession
     let decoder: JSONDecoder
     let apiHost: String
@@ -45,14 +45,14 @@ class ComicsRemoteDataSource : ComicsDataSource {
         self.init(withUrlSession: URLSession.shared, decoder: JSONDecoder(), apiHost: "https://xkcd.com", infoPath: "/info.0.json")
     }
     
-    func latestComicPublisher() -> AnyPublisher<SingleFetchResult, Error> {
+    func latestComic() -> AnyPublisher<SingleFetchResult, Error> {
         guard let url = URL(string: apiHost + infoPath) else {
             return Fail(error: URLError(.badServerResponse)).eraseToAnyPublisher()
         }
         return self.comicPublisher(forUrl: url)
     }
     
-    func comicPublisher(forComicWithId id: Int) -> AnyPublisher<SingleFetchResult, Error> {
+    func comic(withId id: Int) -> AnyPublisher<SingleFetchResult, Error> {
         guard let url = URL(string: apiHost + "/\(id)" + infoPath) else {
             return Fail(error: URLError(.badServerResponse)).eraseToAnyPublisher()
         }
@@ -71,7 +71,7 @@ class ComicsRemoteDataSource : ComicsDataSource {
             .eraseToAnyPublisher()
     }
     
-    func comicsPublisher(withParams params: BatchFetchParams) -> AnyPublisher<BatchFetchResult, Error> {
+    func comics(withParams params: BatchFetchParams) -> AnyPublisher<BatchFetchResult, Error> {
         guard let bookmark = params.bookmark as? xkcdFetchBookmark else {
             return Fail(error: CancellationError()).eraseToAnyPublisher()
         }
@@ -80,7 +80,7 @@ class ComicsRemoteDataSource : ComicsDataSource {
         let batchSize = bookmark.validBatchSize(requestedBatchSize: params.batchSize)
         
         guard batchSize > 1 else {
-            return self.comicPublisher(forComicWithId: startingId)
+            return self.comic(withId: startingId)
                 .map({ result in
                     BatchFetchResult(comics: [result.comic],
                                      nextFetchBookmark: result.nextFetchBookmark)
@@ -91,7 +91,7 @@ class ComicsRemoteDataSource : ComicsDataSource {
         var publishers = [AnyPublisher<SingleFetchResult, Error>]()
         for i in 0..<batchSize {
             let comicId = startingId - i
-            publishers.append(self.comicPublisher(forComicWithId: comicId))
+            publishers.append(self.comic(withId: comicId))
         }
         
         return Publishers.MergeMany(publishers)

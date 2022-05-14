@@ -1,5 +1,5 @@
 //
-//  ReadOnlyComicsRepository.swift
+//  ReadOnlyComicRepository.swift
 //  xkcd
 //
 //  Created by Thanh Huy Nguyen on 5/10/22.
@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-class ReadOnlyComicsRepository : ComicsRepository {
+class ReadOnlyComicRepository : ComicRepository {
     static let FIRST_PAGE_SIZE = 5
     static let NORMAL_PAGE_SIZE = 10
     
@@ -18,16 +18,16 @@ class ReadOnlyComicsRepository : ComicsRepository {
     @Published var errors = [Error]()
     var errorsPublisher: Published<[Error]>.Publisher { $errors }
     
-    let remoteDataSource: ComicsDataSource
+    let remoteDataSource: ComicDataSource
     
     var currentFetch: AnyCancellable?
     var nextFetchBookmark: FetchBookmark?
     
     convenience init() {
-        self.init(withRemoteDataSource: ComicsRemoteDataSource())
+        self.init(withRemoteDataSource: ComicRemoteDataSource())
     }
     
-    init(withRemoteDataSource remoteDataSource: ComicsDataSource) {
+    init(withRemoteDataSource remoteDataSource: ComicDataSource) {
         self.remoteDataSource = remoteDataSource
     }
     
@@ -36,7 +36,7 @@ class ReadOnlyComicsRepository : ComicsRepository {
     }
     
     func fetchNextBatch() {
-        self.fetchBatch(withSize: ReadOnlyComicsRepository.NORMAL_PAGE_SIZE)
+        self.fetchBatch(withSize: ReadOnlyComicRepository.NORMAL_PAGE_SIZE)
     }
     
     private func fetchFirstBatch(forced: Bool = false) {
@@ -49,14 +49,14 @@ class ReadOnlyComicsRepository : ComicsRepository {
             return
         }
         
-        self.currentFetch = self.remoteDataSource.latestComicPublisher()
+        self.currentFetch = self.remoteDataSource.latestComic()
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { [weak self] completion in
                 self?.currentFetch = nil
                 
                 switch completion {
                 case .finished:
-                    self?.fetchBatch(withSize: ReadOnlyComicsRepository.FIRST_PAGE_SIZE - 1,
+                    self?.fetchBatch(withSize: ReadOnlyComicRepository.FIRST_PAGE_SIZE - 1,
                                      forced: forced)
                     break
                 case .failure(let error):
@@ -82,7 +82,7 @@ class ReadOnlyComicsRepository : ComicsRepository {
         let params = BatchFetchParams(bookmark: nextBookmark,
                                       batchSize: size)
         
-        self.currentFetch = self.remoteDataSource.comicsPublisher(withParams: params)
+        self.currentFetch = self.remoteDataSource.comics(withParams: params)
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { [weak self] completion in
                 self?.currentFetch = nil

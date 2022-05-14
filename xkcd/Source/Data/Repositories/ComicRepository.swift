@@ -1,5 +1,5 @@
 //
-//  ComicsRepository.swift
+//  ComicRepository.swift
 //  xkcd
 //
 //  Created by Thanh Huy Nguyen on 5/10/22.
@@ -9,7 +9,7 @@ import Foundation
 import Combine
 
 /// A repository for comics. Comics can be from multiple sources (remote, local caches, etc).
-protocol ComicsRepository {
+protocol ComicRepository {
     
     /// A publisher that delivers the comics that this repository provides.
     var comicsPublisher: Published<[Comic]>.Publisher { get }
