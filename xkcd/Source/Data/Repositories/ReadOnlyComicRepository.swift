@@ -24,7 +24,7 @@ class ReadOnlyComicRepository : ComicRepository {
     var nextFetchBookmark: FetchBookmark?
     
     convenience init() {
-        self.init(withRemoteDataSource: ComicRemoteDataSource())
+        self.init(withRemoteDataSource: RemoteComicDataSource())
     }
     
     init(withRemoteDataSource remoteDataSource: ComicDataSource) {

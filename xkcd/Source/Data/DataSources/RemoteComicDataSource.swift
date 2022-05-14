@@ -1,5 +1,5 @@
 //
-//  ComicRemoteDataSource.swift
+//  RemoteComicDataSource.swift
 //  xkcd
 //
 //  Created by Thanh Huy Nguyen on 5/10/22.
@@ -28,7 +28,7 @@ struct xkcdFetchBookmark : FetchBookmark {
     }
 }
 
-class ComicRemoteDataSource : ComicDataSource {
+class RemoteComicDataSource : ComicDataSource {
     let urlSession: URLSession
     let decoder: JSONDecoder
     let apiHost: String
