@@ -139,7 +139,7 @@ class RemoteComicDataSourceTests: XCTestCase {
         var expectedResult: T.Output?
         let expectation = self.expectation(description: "Awaiting result")
         
-        let cancellable = publisher.print().sink { _ in
+        let cancellable = publisher.sink { _ in
             expectation.fulfill()
         } receiveValue: { result in
             expectedResult = result
