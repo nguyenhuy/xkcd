@@ -29,20 +29,20 @@ struct xkcdFetchBookmark : FetchBookmark {
 }
 
 class RemoteComicDataSource : ComicDataSource {
-    let urlSession: URLSession
+    let networkClient: NetworkClient
     let decoder: JSONDecoder
     let apiHost: String
     let infoPath: String
     
-    init(withUrlSession urlSession: URLSession, decoder: JSONDecoder, apiHost: String, infoPath: String) {
-        self.urlSession = urlSession
+    init(networkClient: NetworkClient, decoder: JSONDecoder, apiHost: String, infoPath: String) {
+        self.networkClient = networkClient
         self.decoder = decoder
         self.apiHost = apiHost
         self.infoPath = infoPath
     }
     
     convenience init() {
-        self.init(withUrlSession: URLSession.shared, decoder: JSONDecoder(), apiHost: "https://xkcd.com", infoPath: "/info.0.json")
+        self.init(networkClient: URLSessionNetworkClient(), decoder: JSONDecoder(), apiHost: "https://xkcd.com", infoPath: "/info.0.json")
     }
     
     func latestComic() -> AnyPublisher<SingleFetchResult, Error> {
@@ -100,7 +100,7 @@ class RemoteComicDataSource : ComicDataSource {
     }
     
     private func comic(forUrl url: URL) -> AnyPublisher<SingleFetchResult, Error> {
-        return urlSession.dataTaskPublisher(for: url)
+        return networkClient.dataTaskPublisher(for: url)
             .map{ $0.data }
             .decode(type: Comic.self, decoder: decoder)
             .map({ comic in

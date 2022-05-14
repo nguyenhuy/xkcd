@@ -12,7 +12,6 @@
 		052F9AA9282AE36200D62F10 /* MainFeedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052F9AA8282AE36200D62F10 /* MainFeedViewController.swift */; };
 		052F9AAE282AE36300D62F10 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 052F9AAD282AE36300D62F10 /* Assets.xcassets */; };
 		052F9AB1282AE36300D62F10 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 052F9AAF282AE36300D62F10 /* LaunchScreen.storyboard */; };
-		052F9ABC282AE36300D62F10 /* xkcdTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052F9ABB282AE36300D62F10 /* xkcdTests.swift */; };
 		052F9AC6282AE36300D62F10 /* xkcdUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052F9AC5282AE36300D62F10 /* xkcdUITests.swift */; };
 		052F9AC8282AE36300D62F10 /* xkcdUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052F9AC7282AE36300D62F10 /* xkcdUITestsLaunchTests.swift */; };
 		05E9C85A282B207000698276 /* Comic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E9C859282B207000698276 /* Comic.swift */; };
@@ -21,6 +20,14 @@
 		05E9C864282B431C00698276 /* ComicRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E9C863282B431C00698276 /* ComicRepository.swift */; };
 		05E9C866282B49EE00698276 /* ReadOnlyComicRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E9C865282B49EE00698276 /* ReadOnlyComicRepository.swift */; };
 		05E9C868282B7BC000698276 /* MainFeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E9C867282B7BC000698276 /* MainFeedViewModel.swift */; };
+		05E9C86C283026CD00698276 /* RemoteComicDataSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E9C86B283026CD00698276 /* RemoteComicDataSourceTests.swift */; };
+		05E9C87228302D4100698276 /* NetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E9C87128302D4100698276 /* NetworkClient.swift */; };
+		05E9C87428302DE800698276 /* URLSessionNetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E9C87328302DE800698276 /* URLSessionNetworkClient.swift */; };
+		05E9C87528302F4B00698276 /* NetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E9C87128302D4100698276 /* NetworkClient.swift */; };
+		05E9C879283032A800698276 /* ComicRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E9C863282B431C00698276 /* ComicRepository.swift */; };
+		05E9C87A283032A800698276 /* RemoteComicDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E9C85E282B21AA00698276 /* RemoteComicDataSource.swift */; };
+		05E9C87B283032A800698276 /* ReadOnlyComicRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E9C865282B49EE00698276 /* ReadOnlyComicRepository.swift */; };
+		05E9C87C283032A800698276 /* ComicDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E9C860282B224500698276 /* ComicDataSource.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,7 +56,6 @@
 		052F9AB0282AE36300D62F10 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		052F9AB2282AE36300D62F10 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		052F9AB7282AE36300D62F10 /* xkcdTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = xkcdTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		052F9ABB282AE36300D62F10 /* xkcdTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = xkcdTests.swift; sourceTree = "<group>"; };
 		052F9AC1282AE36300D62F10 /* xkcdUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = xkcdUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		052F9AC5282AE36300D62F10 /* xkcdUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = xkcdUITests.swift; sourceTree = "<group>"; };
 		052F9AC7282AE36300D62F10 /* xkcdUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = xkcdUITestsLaunchTests.swift; sourceTree = "<group>"; };
@@ -59,6 +65,9 @@
 		05E9C863282B431C00698276 /* ComicRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComicRepository.swift; sourceTree = "<group>"; };
 		05E9C865282B49EE00698276 /* ReadOnlyComicRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadOnlyComicRepository.swift; sourceTree = "<group>"; };
 		05E9C867282B7BC000698276 /* MainFeedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainFeedViewModel.swift; sourceTree = "<group>"; };
+		05E9C86B283026CD00698276 /* RemoteComicDataSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteComicDataSourceTests.swift; sourceTree = "<group>"; };
+		05E9C87128302D4100698276 /* NetworkClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkClient.swift; sourceTree = "<group>"; };
+		05E9C87328302DE800698276 /* URLSessionNetworkClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionNetworkClient.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,7 +130,7 @@
 		052F9ABA282AE36300D62F10 /* xkcdTests */ = {
 			isa = PBXGroup;
 			children = (
-				052F9ABB282AE36300D62F10 /* xkcdTests.swift */,
+				05E9C86D2830290A00698276 /* Data */,
 			);
 			path = xkcdTests;
 			sourceTree = "<group>";
@@ -158,6 +167,7 @@
 			children = (
 				05E9C862282B427700698276 /* Repositories */,
 				05E9C85D282B216E00698276 /* DataSources */,
+				05E9C87028302D1E00698276 /* Networking */,
 				05E9C85B282B214A00698276 /* Models */,
 			);
 			path = Data;
@@ -196,6 +206,31 @@
 				05E9C865282B49EE00698276 /* ReadOnlyComicRepository.swift */,
 			);
 			path = Repositories;
+			sourceTree = "<group>";
+		};
+		05E9C86D2830290A00698276 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				05E9C86E2830290E00698276 /* DataSources */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		05E9C86E2830290E00698276 /* DataSources */ = {
+			isa = PBXGroup;
+			children = (
+				05E9C86B283026CD00698276 /* RemoteComicDataSourceTests.swift */,
+			);
+			path = DataSources;
+			sourceTree = "<group>";
+		};
+		05E9C87028302D1E00698276 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				05E9C87128302D4100698276 /* NetworkClient.swift */,
+				05E9C87328302DE800698276 /* URLSessionNetworkClient.swift */,
+			);
+			path = Networking;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -329,12 +364,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				05E9C85F282B21AA00698276 /* RemoteComicDataSource.swift in Sources */,
+				05E9C87228302D4100698276 /* NetworkClient.swift in Sources */,
 				052F9AA9282AE36200D62F10 /* MainFeedViewController.swift in Sources */,
 				05E9C85A282B207000698276 /* Comic.swift in Sources */,
 				05E9C864282B431C00698276 /* ComicRepository.swift in Sources */,
 				052F9AA5282AE36200D62F10 /* AppDelegate.swift in Sources */,
 				05E9C866282B49EE00698276 /* ReadOnlyComicRepository.swift in Sources */,
 				05E9C868282B7BC000698276 /* MainFeedViewModel.swift in Sources */,
+				05E9C87428302DE800698276 /* URLSessionNetworkClient.swift in Sources */,
 				05E9C861282B224500698276 /* ComicDataSource.swift in Sources */,
 				052F9AA7282AE36200D62F10 /* SceneDelegate.swift in Sources */,
 			);
@@ -344,7 +381,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				052F9ABC282AE36300D62F10 /* xkcdTests.swift in Sources */,
+				05E9C87C283032A800698276 /* ComicDataSource.swift in Sources */,
+				05E9C87A283032A800698276 /* RemoteComicDataSource.swift in Sources */,
+				05E9C87B283032A800698276 /* ReadOnlyComicRepository.swift in Sources */,
+				05E9C86C283026CD00698276 /* RemoteComicDataSourceTests.swift in Sources */,
+				05E9C879283032A800698276 /* ComicRepository.swift in Sources */,
+				05E9C87528302F4B00698276 /* NetworkClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
