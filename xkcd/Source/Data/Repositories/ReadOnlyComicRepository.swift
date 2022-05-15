@@ -79,12 +79,24 @@ class ReadOnlyComicRepository : ComicRepository {
     
     private func fetchBatch(withSize size: Int, forced: Bool = false) {
         if (self.isFetching() && !forced) {
+            // There is an inflight fetch, wait for it
             return
         }
-
-        guard self.didFetchFirstBatch(), let nextBookmark = self.nextFetchBookmark else {
+        
+        guard self.didReachEnd() == false else {
+            // Data source ran out of comics
+            return
+        }
+        
+        guard self.didFetchFirstBatch() else {
             // Make sure to fetch first batch first
             self.fetchFirstBatch()
+            return
+        }
+        
+        guard let nextBookmark = self.nextFetchBookmark else {
+            // Bookmark must be available at this point. Throw an internal error otherwise
+            self.errors.append(URLError(.resourceUnavailable))
             return
         }
         
@@ -118,6 +130,10 @@ class ReadOnlyComicRepository : ComicRepository {
     
     private func didFetchFirstBatch() -> Bool {
         return self.nextFetchBookmark != nil && self.comics.count > 0
+    }
+    
+    private func didReachEnd() -> Bool {
+        return self.nextFetchBookmark == nil && self.comics.count > 0
     }
     
     func purge() {
