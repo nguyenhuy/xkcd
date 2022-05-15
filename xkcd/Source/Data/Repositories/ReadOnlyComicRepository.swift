@@ -9,26 +9,31 @@ import Foundation
 import Combine
 
 class ReadOnlyComicRepository : ComicRepository {
-    static let FIRST_PAGE_SIZE = 5
-    static let NORMAL_PAGE_SIZE = 10
-    
     @Published var comics = [Comic]()
     var comicsPublisher: Published<[Comic]>.Publisher { $comics }
     
     @Published var errors = [Error]()
     var errorsPublisher: Published<[Error]>.Publisher { $errors }
     
-    let remoteDataSource: ComicDataSource
+    let dataSource: ComicDataSource
+    let firstBatchSize: Int
+    let normalBatchSize: Int
     
     var currentFetch: AnyCancellable?
     var nextFetchBookmark: FetchBookmark?
     
     convenience init() {
-        self.init(withRemoteDataSource: RemoteComicDataSource())
+        self.init(dataSource: RemoteComicDataSource(),
+                  firstBatchSize: 5,
+                  normalBatchSize: 10)
     }
     
-    init(withRemoteDataSource remoteDataSource: ComicDataSource) {
-        self.remoteDataSource = remoteDataSource
+    init(dataSource: ComicDataSource,
+         firstBatchSize: Int,
+         normalBatchSize: Int) {
+        self.dataSource = dataSource
+        self.firstBatchSize = firstBatchSize
+        self.normalBatchSize = normalBatchSize
     }
     
     func prewarm() {
@@ -36,7 +41,7 @@ class ReadOnlyComicRepository : ComicRepository {
     }
     
     func fetchNextBatch() {
-        self.fetchBatch(withSize: ReadOnlyComicRepository.NORMAL_PAGE_SIZE)
+        self.fetchBatch(withSize: self.normalBatchSize)
     }
     
     private func fetchFirstBatch(forced: Bool = false) {
@@ -44,28 +49,32 @@ class ReadOnlyComicRepository : ComicRepository {
             return
         }
         
-        guard self.didFetchFirstPage() == false else {
-            // Make sure to not fetch first page repeatedly
+        guard self.didFetchFirstBatch() == false else {
+            // Make sure to not fetch first batch repeatedly
             return
         }
         
-        self.currentFetch = self.remoteDataSource.latestComic()
+        self.currentFetch = self.dataSource.latestComic()
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { [weak self] completion in
-                self?.currentFetch = nil
+                guard let self = self else { return }
+                
+                self.currentFetch = nil
                 
                 switch completion {
                 case .finished:
-                    self?.fetchBatch(withSize: ReadOnlyComicRepository.FIRST_PAGE_SIZE - 1,
+                    self.fetchBatch(withSize: self.firstBatchSize - 1,
                                      forced: forced)
                     break
                 case .failure(let error):
-                    self?.errors.append(error)
+                    self.errors.append(error)
                 }
             }, receiveValue: { [weak self] result in
-                self?.comics.append(result.comic)
-                self?.nextFetchBookmark = result.nextFetchBookmark
-        })
+                guard let self = self else { return }
+                
+                self.comics.append(result.comic)
+                self.nextFetchBookmark = result.nextFetchBookmark
+            })
     }
     
     private func fetchBatch(withSize size: Int, forced: Bool = false) {
@@ -73,8 +82,8 @@ class ReadOnlyComicRepository : ComicRepository {
             return
         }
 
-        guard self.didFetchFirstPage(), let nextBookmark = self.nextFetchBookmark else {
-            // Make sure to fetch first page first
+        guard self.didFetchFirstBatch(), let nextBookmark = self.nextFetchBookmark else {
+            // Make sure to fetch first batch first
             self.fetchFirstBatch()
             return
         }
@@ -82,28 +91,32 @@ class ReadOnlyComicRepository : ComicRepository {
         let params = BatchFetchParams(bookmark: nextBookmark,
                                       batchSize: size)
         
-        self.currentFetch = self.remoteDataSource.comics(withParams: params)
+        self.currentFetch = self.dataSource.comics(withParams: params)
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { [weak self] completion in
-                self?.currentFetch = nil
+                guard let self = self else { return }
+                
+                self.currentFetch = nil
                 
                 switch completion {
                 case .finished:
                     break
                 case .failure(let error):
-                    self?.errors.append(error)
+                    self.errors.append(error)
                 }
             }, receiveValue: { [weak self] result in
-                self?.comics.append(contentsOf: result.comics)
-                self?.nextFetchBookmark = result.nextFetchBookmark
-        })
+                guard let self = self else { return }
+                
+                self.comics.append(contentsOf: result.comics)
+                self.nextFetchBookmark = result.nextFetchBookmark
+            })
     }
     
     private func isFetching() -> Bool {
         return self.currentFetch != nil
     }
     
-    private func didFetchFirstPage() -> Bool {
+    private func didFetchFirstBatch() -> Bool {
         return self.nextFetchBookmark != nil && self.comics.count > 0
     }
     

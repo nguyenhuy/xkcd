@@ -22,7 +22,8 @@ protocol ComicRepository {
     func prewarm()
     
     /// Asks the repository to fetch the next batch of comics
-    /// Calling this when the repository is empty will cause it to fetch the first batch.
+    /// Calling this method when the repository is empty will cause it to fetch the first batch.
+    /// Calling this method while a batch if fetch is already inflight will do nothing.
     func fetchNextBatch()
     
     /// Tells the repository to purge its data.
