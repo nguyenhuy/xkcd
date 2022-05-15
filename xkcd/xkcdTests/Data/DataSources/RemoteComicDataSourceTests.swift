@@ -135,6 +135,68 @@ class RemoteComicDataSourceTests: XCTestCase {
         XCTAssertNil(result.nextFetchBookmark)
     }
     
+    func testFetchMultipleBatchesWithFilledLastBatch() throws {
+        let expectedNumberOfComics = 20
+        let startingId = expectedNumberOfComics
+        let batchSize = 10
+        let numberOfBatches = Int(ceil(Double(startingId) / Double(batchSize)))
+        for i in 0..<startingId {
+            let id = startingId - i
+            let url = URL(string: apiHost + "/\(id)" + infoPath)!
+            let publisher = networkClient.mockPublisher(for: id)
+            networkClient.returnedPublishers[url] = publisher
+        }
+        
+        var comics = [Comic]()
+        var bookmark: FetchBookmark? = xkcdFetchBookmark(rawValue: startingId)
+        for _ in 0..<numberOfBatches {
+            if let currentBookmark = bookmark {
+                let params = BatchFetchParams(bookmark: currentBookmark, batchSize: batchSize)
+                let result = try waitForPublisher(publisher: dataSource.comics(withParams: params))
+                comics.append(contentsOf: result.comics)
+                bookmark = result.nextFetchBookmark
+            }
+        }
+
+        XCTAssertEqual(comics.count, expectedNumberOfComics)
+        // Test that the returned comics are sorted
+        for i in 1..<expectedNumberOfComics {
+            XCTAssert(comics[i - 1].id > comics[i].id)
+        }
+        XCTAssertNil(bookmark)
+    }
+    
+    func testFetchMultipleBatchesWithHalfFilledLastBatch() throws {
+        let expectedNumberOfComics = 23
+        let startingId = expectedNumberOfComics
+        let batchSize = 10
+        let numberOfBatches = Int(ceil(Double(startingId) / Double(batchSize)))
+        for i in 0..<startingId {
+            let id = startingId - i
+            let url = URL(string: apiHost + "/\(id)" + infoPath)!
+            let publisher = networkClient.mockPublisher(for: id)
+            networkClient.returnedPublishers[url] = publisher
+        }
+        
+        var comics = [Comic]()
+        var bookmark: FetchBookmark? = xkcdFetchBookmark(rawValue: startingId)
+        for _ in 0..<numberOfBatches {
+            if let currentBookmark = bookmark {
+                let params = BatchFetchParams(bookmark: currentBookmark, batchSize: batchSize)
+                let result = try waitForPublisher(publisher: dataSource.comics(withParams: params))
+                comics.append(contentsOf: result.comics)
+                bookmark = result.nextFetchBookmark
+            }
+        }
+
+        XCTAssertEqual(comics.count, expectedNumberOfComics)
+        // Test that the returned comics are sorted
+        for i in 1..<expectedNumberOfComics {
+            XCTAssert(comics[i - 1].id > comics[i].id)
+        }
+        XCTAssertNil(bookmark)
+    }
+    
     private func waitForPublisher<T: Publisher>(publisher: T) throws -> T.Output {
         var expectedResult: T.Output?
         let expectation = self.expectation(description: "Awaiting result")
