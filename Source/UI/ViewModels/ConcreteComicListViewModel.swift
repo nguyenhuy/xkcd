@@ -22,7 +22,8 @@ class ConcreteComicListViewModel: ComicListViewModel {
                     ComicItemUIState(id: comic.id,
                                      title: comic.title,
                                      imageURL: comic.imageURL,
-                                     description: comic.alternativeText)
+                                     description: comic.alternativeText,
+                                     explainationURL: URL(string: "https://www.explainxkcd.com/wiki/index.php/\(comic.id)")!)
                 }
             })
             .map({[weak self] comicItemStates in

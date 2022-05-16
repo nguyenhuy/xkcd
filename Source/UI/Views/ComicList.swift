@@ -9,11 +9,11 @@ import SwiftUI
 import Combine
 
 struct ComicRow: View {
-    let itemState: ComicItemUIState
+    let uiState: ComicItemUIState
     
     var body: some View {
         VStack {
-            AsyncImage(url: itemState.imageURL) { image in
+            AsyncImage(url: uiState.imageURL) { image in
                 image.resizable()
                     .scaledToFit()
             } placeholder: {
@@ -21,7 +21,7 @@ struct ComicRow: View {
             }
             .frame(maxWidth: .infinity,
                    idealHeight: 200)
-            Text("\(itemState.id): \(itemState.title)")
+            Text("\(uiState.id): \(uiState.title)")
         }
     }
 }
@@ -33,7 +33,9 @@ struct ComicList<ViewModel>: View where ViewModel: ComicListViewModel {
         NavigationView {
             List {
                 ForEach(viewModel.uiState.itemStates) { itemState in
-                    ComicRow(itemState: itemState)
+                    NavigationLink(destination: ComicDetailView(uiState: itemState)) {
+                        ComicRow(uiState: itemState)
+                    }
                 }
                 
                 if viewModel.uiState.hasMore {

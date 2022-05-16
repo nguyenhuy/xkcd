@@ -13,6 +13,7 @@ struct ComicItemUIState: Identifiable {
     let title: String
     let imageURL: URL
     let description: String
+    let explainationURL: URL
 }
 
 struct ComicListUIState {
