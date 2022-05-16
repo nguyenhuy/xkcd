@@ -83,7 +83,7 @@ class ReadOnlyComicRepository : ComicRepository {
             return
         }
         
-        guard self.hasMore() == false else {
+        guard self.hasMore() else {
             // Data source ran out of comics
             return
         }
