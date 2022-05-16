@@ -386,6 +386,7 @@
 				05C0C79F28309A6A001CF997 /* URLSessionNetworkClient.swift in Sources */,
 				05C0C7A228309A71001CF997 /* Comic.swift in Sources */,
 				05C0C7A028309A6A001CF997 /* NetworkClient.swift in Sources */,
+				05C0C7AC2831EB02001CF997 /* ConcreteComicListViewModel.swift in Sources */,
 				05C0C7A62831D7BB001CF997 /* ComicList.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
