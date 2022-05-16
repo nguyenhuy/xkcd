@@ -9,13 +9,13 @@ import Foundation
 import Combine
 
 /// A repository for comics. Comics can be from multiple sources (remote, local caches, etc).
-protocol ComicRepository {
+protocol ComicRepository: ObservableObject {
     
-    /// A publisher that delivers the comics that this repository provides.
-    var comicsPublisher: Published<[Comic]>.Publisher { get }
+    /// The comics that this repository provides.
+    var comics: [Comic] { get set }
     
-    /// A publisher that delivers errors that this repository encouters.
-    var errorsPublisher: Published<[Error]>.Publisher { get }
+    /// The errors that this repository encouters.
+    var errors: [Error] { get set }
     
     /// Tells the repository to prime itself because it'll be asked for some comics very shortly.
     /// For examples, it can warming a HTTP connection to backend API, or open a file/DB connection.
@@ -25,6 +25,10 @@ protocol ComicRepository {
     /// Calling this method when the repository is empty will cause it to fetch the first batch.
     /// Calling this method while a batch if fetch is already inflight will do nothing.
     func fetchNextBatch()
+    
+    /// Whether this repository has more comics to fetch
+    /// - Returns: true if has more, false otherwise
+    func hasMore() -> Bool
     
     /// Tells the repository to purge its data.
     /// The next fetchNextBatch() will fetch the first page.

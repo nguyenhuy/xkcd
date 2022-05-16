@@ -10,10 +10,7 @@ import Combine
 
 class ReadOnlyComicRepository : ComicRepository {
     @Published var comics = [Comic]()
-    var comicsPublisher: Published<[Comic]>.Publisher { $comics }
-    
     @Published var errors = [Error]()
-    var errorsPublisher: Published<[Error]>.Publisher { $errors }
     
     let dataSource: ComicDataSource
     let firstBatchSize: Int
@@ -69,6 +66,8 @@ class ReadOnlyComicRepository : ComicRepository {
                 case .failure(let error):
                     self.errors.append(error)
                 }
+                
+                self.objectWillChange.send()
             }, receiveValue: { [weak self] result in
                 guard let self = self else { return }
                 
@@ -83,7 +82,7 @@ class ReadOnlyComicRepository : ComicRepository {
             return
         }
         
-        guard self.didReachEnd() == false else {
+        guard self.hasMore() == false else {
             // Data source ran out of comics
             return
         }
@@ -116,6 +115,8 @@ class ReadOnlyComicRepository : ComicRepository {
                 case .failure(let error):
                     self.errors.append(error)
                 }
+                
+                self.objectWillChange.send()
             }, receiveValue: { [weak self] result in
                 guard let self = self else { return }
                 
@@ -129,11 +130,11 @@ class ReadOnlyComicRepository : ComicRepository {
     }
     
     private func didFetchFirstBatch() -> Bool {
-        return self.nextFetchBookmark != nil && self.comics.count > 0
+        return self.nextFetchBookmark != nil && !self.comics.isEmpty
     }
     
-    private func didReachEnd() -> Bool {
-        return self.nextFetchBookmark == nil && self.comics.count > 0
+    func hasMore() -> Bool {
+        return !didFetchFirstBatch() || self.nextFetchBookmark != nil
     }
     
     func purge() {
