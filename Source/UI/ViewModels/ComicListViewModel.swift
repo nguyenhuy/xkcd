@@ -16,50 +16,19 @@ struct ComicItemUIState: Identifiable {
 }
 
 struct ComicListUIState {
-    let comics: [ComicItemUIState]
-    let errors: [Error]
-    let hasMore: Bool
+    var itemStates: [ComicItemUIState]
+    var errors: [Error]
+    var hasMore: Bool
 }
 
-class ComicListViewModel<Repository>: ObservableObject where Repository: ComicRepository {
-    @Published var uiState: ComicListUIState
-    private let repository: Repository
-    private var cancellable: AnyCancellable?
+protocol ComicListViewModel: ObservableObject {
+    var uiState: ComicListUIState { get set }
     
-    init(repository: Repository) {
-        self.repository = repository
-        self.uiState = ComicListUIState(comics: [], errors: [], hasMore: false)
-        
-        let itemStatesPublisher = repository.comics.publisher
-            .map { comic in
-                ComicItemUIState(id: comic.id,
-                                 title: comic.title,
-                                 imageURL: comic.imageURL,
-                                 description: comic.alternativeText)
-            }
-        
-        cancellable = Publishers.Zip(itemStatesPublisher.collect(), repository.errors.publisher.collect())
-            .map({[weak self] (comicItemStates, errors) in
-                let hasMore = self?.repository.hasMore() ?? false
-                return ComicListUIState(comics: comicItemStates,
-                                        errors: errors,
-                                        hasMore: hasMore)
-            })
-            .sink(receiveCompletion: { [weak self] completion in
-                self?.objectWillChange.send()
-            }, receiveValue: { [weak self] newState in
-                self?.uiState = newState
-            })
-        
-        repository.prewarm()
-    }
+    /// Asks the view model to fetch the next batch of comics
+    /// Calling this method when the view model's state is empty will cause it to fetch the first batch.
+    /// Calling this method while a batch if fetch is already inflight will do nothing.
+    func fetchNextBatch()
     
-    func fetchNextBatch() {
-        repository.fetchNextBatch()
-    }
-    
-    func refresh() {
-        repository.purge()
-        repository.fetchNextBatch()
-    }
+    /// Asks the view model to refresh its state
+    func refresh()
 }
