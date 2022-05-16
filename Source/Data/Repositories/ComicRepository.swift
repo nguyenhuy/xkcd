@@ -9,13 +9,13 @@ import Foundation
 import Combine
 
 /// A repository for comics. Comics can be from multiple sources (remote, local caches, etc).
-protocol ComicRepository: ObservableObject {
+protocol ComicRepository {
     
-    /// The comics that this repository provides.
-    var comics: [Comic] { get set }
+    /// A publisher that delivers the comics that this repository provides.
+    var comicsPublisher: Published<[Comic]>.Publisher { get }
     
-    /// The errors that this repository encouters.
-    var errors: [Error] { get set }
+    /// A publisher that delivers errors that this repository encouters.
+    var errorsPublisher: Published<[Error]>.Publisher { get }
     
     /// Tells the repository to prime itself because it'll be asked for some comics very shortly.
     /// For examples, it can warming a HTTP connection to backend API, or open a file/DB connection.
