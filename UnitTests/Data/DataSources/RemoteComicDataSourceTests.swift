@@ -43,15 +43,97 @@ class RemoteComicDataSourceTests: XCTestCase {
         dataSource = RemoteComicDataSource(networkClient: networkClient, decoder: decoder, apiHost: apiHost, infoPath: infoPath)
     }
     
-    func testFetchLatestComit() throws {
-        let expectedComicId = 1234
+    func testFetchedFirstComicsAreSorted() throws {
+        let latestComidId = 1000
+        let batchSize = 10
+        
         let url = URL(string: apiHost + infoPath)!
-        let publisher = networkClient.mockPublisher(for: expectedComicId)
+        let publisher = networkClient.mockPublisher(for: latestComidId)
         networkClient.returnedPublishers[url] = publisher
         
-        let result = try waitForPublisher(publisher: dataSource.latestComic())
-
-        XCTAssertEqual(result.comic.id, expectedComicId)
+        for i in 1..<batchSize {
+            let id = latestComidId - i
+            let url = URL(string: apiHost + "/\(id)" + infoPath)!
+            let publisher = networkClient.mockPublisher(for: id)
+            networkClient.returnedPublishers[url] = publisher
+        }
+        
+        let result = try waitForPublisher(publisher: dataSource.firstComics(size: batchSize))
+        let returnedIds = result.comics.map() { $0.id }
+        
+        XCTAssertEqual(returnedIds.count, batchSize)
+        XCTAssertEqual(returnedIds.first, latestComidId)
+        // Test that the returned comics are sorted
+        for i in 1..<batchSize {
+            XCTAssert(returnedIds[i - 1] > returnedIds[i])
+        }
+    }
+    
+    func testFetchFewerFirstComicsThanAvailable() throws {
+        let latestComidId = 20
+        let batchSize = 10
+        
+        let url = URL(string: apiHost + infoPath)!
+        let publisher = networkClient.mockPublisher(for: latestComidId)
+        networkClient.returnedPublishers[url] = publisher
+        
+        for i in 1..<batchSize {
+            let id = latestComidId - i
+            let url = URL(string: apiHost + "/\(id)" + infoPath)!
+            let publisher = networkClient.mockPublisher(for: id)
+            networkClient.returnedPublishers[url] = publisher
+        }
+        
+        let result = try waitForPublisher(publisher: dataSource.firstComics(size: batchSize))
+        let returnedIds = result.comics.map() { $0.id }
+        
+        XCTAssertEqual(returnedIds.count, batchSize)
+        XCTAssertNotNil(result.nextFetchBookmark)
+    }
+    
+    func testFetchAllFirstComics() throws {
+        let latestComidId = 5
+        let batchSize = 5
+        
+        let url = URL(string: apiHost + infoPath)!
+        let publisher = networkClient.mockPublisher(for: latestComidId)
+        networkClient.returnedPublishers[url] = publisher
+        
+        for i in 1..<batchSize {
+            let id = latestComidId - i
+            let url = URL(string: apiHost + "/\(id)" + infoPath)!
+            let publisher = networkClient.mockPublisher(for: id)
+            networkClient.returnedPublishers[url] = publisher
+        }
+        
+        let result = try waitForPublisher(publisher: dataSource.firstComics(size: batchSize))
+        let returnedIds = result.comics.map() { $0.id }
+        
+        XCTAssertEqual(returnedIds.count, batchSize)
+        XCTAssertNil(result.nextFetchBookmark)
+    }
+    
+    func testFetchMoreFirstComicsThanAvailable() throws {
+        let latestComidId = 5
+        let batchSize = 10
+        let expectedBatchSize = 5
+        
+        let url = URL(string: apiHost + infoPath)!
+        let publisher = networkClient.mockPublisher(for: latestComidId)
+        networkClient.returnedPublishers[url] = publisher
+        
+        for i in 1..<batchSize {
+            let id = latestComidId - i
+            let url = URL(string: apiHost + "/\(id)" + infoPath)!
+            let publisher = networkClient.mockPublisher(for: id)
+            networkClient.returnedPublishers[url] = publisher
+        }
+        
+        let result = try waitForPublisher(publisher: dataSource.firstComics(size: batchSize))
+        let returnedIds = result.comics.map() { $0.id }
+        
+        XCTAssertEqual(returnedIds.count, expectedBatchSize)
+        XCTAssertNil(result.nextFetchBookmark)
     }
     
     func testFetchedComicsAreSorted() throws {

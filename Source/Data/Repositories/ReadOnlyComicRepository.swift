@@ -40,10 +40,6 @@ class ReadOnlyComicRepository : ComicRepository {
         self.fetchFirstBatch(forced: true)
     }
     
-    func fetchNextBatch() {
-        self.fetchBatch(withSize: self.normalBatchSize)
-    }
-    
     private func fetchFirstBatch(forced: Bool = false) {
         if (self.isFetching() && !forced) {
             return
@@ -54,31 +50,11 @@ class ReadOnlyComicRepository : ComicRepository {
             return
         }
         
-        self.currentFetch = self.dataSource.latestComic()
-            .receive(on: RunLoop.main)
-            .sink(receiveCompletion: { [weak self] completion in
-                guard let self = self else { return }
-                
-                self.currentFetch = nil
-                
-                switch completion {
-                case .finished:
-                    self.fetchBatch(withSize: self.firstBatchSize - 1,
-                                     forced: forced)
-                    break
-                case .failure(let error):
-                    self.errors.append(error)
-                }
-            }, receiveValue: { [weak self] result in
-                guard let self = self else { return }
-                
-                self.comics.append(result.comic)
-                self.nextFetchBookmark = result.nextFetchBookmark
-            })
+        consume(publisher: dataSource.firstComics(size: firstBatchSize))
     }
     
-    private func fetchBatch(withSize size: Int, forced: Bool = false) {
-        if (self.isFetching() && !forced) {
+    func fetchNextBatch() {
+        if (self.isFetching()) {
             // There is an inflight fetch, wait for it
             return
         }
@@ -101,9 +77,13 @@ class ReadOnlyComicRepository : ComicRepository {
         }
         
         let params = BatchFetchParams(bookmark: nextBookmark,
-                                      batchSize: size)
+                                      batchSize: normalBatchSize)
         
-        self.currentFetch = self.dataSource.comics(withParams: params)
+        consume(publisher: dataSource.comics(withParams: params))
+    }
+    
+    private func consume(publisher: AnyPublisher<BatchFetchResult, Error>) {
+        self.currentFetch = publisher
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { [weak self] completion in
                 guard let self = self else { return }

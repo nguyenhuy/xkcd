@@ -31,25 +31,16 @@ struct BatchFetchResult {
     let nextFetchBookmark: FetchBookmark?
 }
 
-/// The result of a single comic fetch
-struct SingleFetchResult {
-    
-    /// The comic
-    let comic: Comic
-    
-    /// The bookmark to be used to fetch the next comic(s)
-    /// No next batch available if nil
-    let nextFetchBookmark: FetchBookmark?
-}
-
 /// A data source for comics, can be remote or local
 protocol ComicDataSource {
     
-    /// - Returns: A publisher that delivers the most recent comic
-    func latestComic() -> AnyPublisher<SingleFetchResult, Error>
+    /// Provides a publisher that can fetch the first batch of comics
+    /// - Returns: A publisher that delivers the first batch, as well as the bookmark for the next one.
+    /// - Returns: The size of this first batch
+    func firstComics(size: Int) -> AnyPublisher<BatchFetchResult, Error>
     
     /// Provides a publisher that can fetch multiple comics at once
-    /// - Returns: A publisher that delivers a batch of comics, as well as the bookmark for the next batch.
+    /// - Returns: A publisher that delivers a batch of comics, as well as the bookmark for the next one.
     /// - Parameter params: Parameters for the fetch.
     func comics(withParams params: BatchFetchParams) -> AnyPublisher<BatchFetchResult, Error>
 }

@@ -28,6 +28,17 @@ struct xkcdFetchBookmark : FetchBookmark {
     }
 }
 
+/// The result of a single comic fetch
+struct SingleFetchResult {
+    
+    /// The comic
+    let comic: Comic
+    
+    /// The bookmark to be used to fetch the next comic(s)
+    /// No next batch available if nil
+    let nextFetchBookmark: FetchBookmark?
+}
+
 class RemoteComicDataSource : ComicDataSource {
     let networkClient: NetworkClient
     let decoder: JSONDecoder
@@ -42,14 +53,34 @@ class RemoteComicDataSource : ComicDataSource {
     }
     
     convenience init() {
-        self.init(networkClient: URLSessionNetworkClient(), decoder: JSONDecoder(), apiHost: "https://xkcd.com", infoPath: "/info.0.json")
+        self.init(networkClient: URLSessionNetworkClient(),
+                  decoder: JSONDecoder(),
+                  apiHost: "https://xkcd.com",
+                  infoPath: "/info.0.json")
     }
     
-    func latestComic() -> AnyPublisher<SingleFetchResult, Error> {
-        guard let url = URL(string: apiHost + infoPath) else {
-            return Fail(error: URLError(.badServerResponse)).eraseToAnyPublisher()
-        }
-        return self.comic(forUrl: url)
+    func firstComics(size: Int) -> AnyPublisher<BatchFetchResult, Error> {
+        return latestComic()
+            .map { [weak self] result -> AnyPublisher<BatchFetchResult, Error> in
+                let firstBatch = BatchFetchResult(comics: [result.comic], nextFetchBookmark: nil)
+                let firstBatchPublisher = Result<BatchFetchResult, Error>.success(firstBatch)
+                    .publisher
+                    .eraseToAnyPublisher()
+                guard let self = self, let bookmark = result.nextFetchBookmark else {
+                    return firstBatchPublisher
+                }
+                
+                let nextBatchPublisher = self.comics(withParams: BatchFetchParams(bookmark: bookmark, batchSize: size - 1))
+                
+                return Publishers.Zip(firstBatchPublisher, nextBatchPublisher)
+                    .map { (first, next) in
+                        BatchFetchResult(comics: first.comics + next.comics,
+                                         nextFetchBookmark: next.nextFetchBookmark)
+                    }
+                    .eraseToAnyPublisher()
+            }
+            .switchToLatest()
+            .eraseToAnyPublisher()
     }
     
     func comics(withParams params: BatchFetchParams) -> AnyPublisher<BatchFetchResult, Error> {
@@ -90,6 +121,13 @@ class RemoteComicDataSource : ComicDataSource {
                                         nextFetchBookmark: last.nextFetchBookmark)
             })
             .eraseToAnyPublisher()
+    }
+    
+    private func latestComic() -> AnyPublisher<SingleFetchResult, Error> {
+        guard let url = URL(string: apiHost + infoPath) else {
+            return Fail(error: URLError(.badServerResponse)).eraseToAnyPublisher()
+        }
+        return self.comic(forUrl: url)
     }
     
     private func comic(withId id: Int) -> AnyPublisher<SingleFetchResult, Error> {
