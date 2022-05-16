@@ -27,7 +27,7 @@ struct ComicRow: View {
 }
 
 struct ComicList<ViewModel>: View where ViewModel: ComicListViewModel {
-    let viewModel: ViewModel
+    @ObservedObject var viewModel: ViewModel
     
     var body: some View {
         List {

@@ -16,9 +16,9 @@ struct ComicItemUIState: Identifiable {
 }
 
 struct ComicListUIState {
-    var itemStates: [ComicItemUIState]
-    var errors: [Error]
-    var hasMore: Bool
+    let itemStates: [ComicItemUIState]
+    let errors: [Error]
+    let hasMore: Bool
 }
 
 protocol ComicListViewModel: ObservableObject {
