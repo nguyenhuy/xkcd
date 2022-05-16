@@ -22,6 +22,7 @@ struct ComicListUIState {
 }
 
 protocol ComicListViewModel: ObservableObject {
+    /// The UI state of this view model
     var uiState: ComicListUIState { get set }
     
     /// Asks the view model to fetch the next batch of comics
