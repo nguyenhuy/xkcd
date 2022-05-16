@@ -12,7 +12,10 @@ struct MainView<LatestComicListViewModel>: View where LatestComicListViewModel: 
 
     var body: some View {
         TabView {
-            ComicList(viewModel: latestComicListViewModel)
+            ComicList(viewModel: latestComicListViewModel).tabItem() {
+                Text("Latest Feed")
+                Image(systemName: "house")
+            }
         }
     }
 }

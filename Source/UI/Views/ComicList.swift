@@ -30,31 +30,25 @@ struct ComicList<ViewModel>: View where ViewModel: ComicListViewModel {
     @ObservedObject var viewModel: ViewModel
     
     var body: some View {
-        List {
-            ForEach(viewModel.uiState.itemStates) { itemState in
-                ComicRow(itemState: itemState)
+        NavigationView {
+            List {
+                ForEach(viewModel.uiState.itemStates) { itemState in
+                    ComicRow(itemState: itemState)
+                }
+                
+                if viewModel.uiState.hasMore {
+                    ProgressView("Loading...")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .onAppear() {
+                            viewModel.fetchNextBatch()
+                        }
+                }
             }
-            
-            if viewModel.uiState.hasMore {
-                ProgressView("Loading...")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .onAppear() {
-                        viewModel.fetchNextBatch()
-                    }
+            .refreshable {
+                viewModel.refresh()
             }
+            .navigationTitle(Text("Latest"))
         }
-        .refreshable {
-            viewModel.refresh()
-        }
-        .navigationTitle(Text("Latest"))
-    }
-}
-
-struct ComicList_Previews: PreviewProvider {
-    static var previews: some View {
-        let repo = ReadOnlyComicRepository()
-        let viewModel = ConcreteComicListViewModel(repository: repo)
-        ComicList(viewModel: viewModel)
     }
 }
