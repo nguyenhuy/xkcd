@@ -7,16 +7,12 @@
 
 import SwiftUI
 
-struct MainView_Previews: PreviewProvider {
-    static var previews: some View {
-        MainView()
-    }
-}
+struct MainView<LatestComicListViewModel>: View where LatestComicListViewModel: ComicListViewModel {
+    let latestComicListViewModel: LatestComicListViewModel
 
-struct MainView: View {
     var body: some View {
         TabView {
-            
+            ComicList(viewModel: latestComicListViewModel)
         }
     }
 }

@@ -9,9 +9,17 @@ import SwiftUI
 
 @main
 struct xkcdApp: App {
+    let latestComicsRepository: ComicRepository
+    
+    init() {
+        latestComicsRepository = ReadOnlyComicRepository()
+    }
+    
     var body: some Scene {
+        let viewModel = ConcreteComicListViewModel(repository: latestComicsRepository)
+        
         WindowGroup {
-            MainView()
+            MainView(latestComicListViewModel: viewModel)
         }
     }
 }
