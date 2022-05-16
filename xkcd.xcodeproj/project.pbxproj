@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		05C0C79428309997001CF997 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 05C0C79328309997001CF997 /* Preview Assets.xcassets */; };
 		05C0C79728309A59001CF997 /* ComicRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C0C79528309A59001CF997 /* ComicRepository.swift */; };
-		05C0C79828309A59001CF997 /* ReadOnlyComicRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C0C79628309A59001CF997 /* ReadOnlyComicRepository.swift */; };
+		05C0C79828309A59001CF997 /* ConcreteComicRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C0C79628309A59001CF997 /* ConcreteComicRepository.swift */; };
 		05C0C79B28309A61001CF997 /* ComicDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C0C79928309A61001CF997 /* ComicDataSource.swift */; };
 		05C0C79C28309A61001CF997 /* RemoteComicDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C0C79A28309A61001CF997 /* RemoteComicDataSource.swift */; };
 		05C0C79F28309A6A001CF997 /* URLSessionNetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C0C79D28309A6A001CF997 /* URLSessionNetworkClient.swift */; };
@@ -49,7 +49,7 @@
 /* Begin PBXFileReference section */
 		05C0C79328309997001CF997 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		05C0C79528309A59001CF997 /* ComicRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComicRepository.swift; sourceTree = "<group>"; };
-		05C0C79628309A59001CF997 /* ReadOnlyComicRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadOnlyComicRepository.swift; sourceTree = "<group>"; };
+		05C0C79628309A59001CF997 /* ConcreteComicRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConcreteComicRepository.swift; sourceTree = "<group>"; };
 		05C0C79928309A61001CF997 /* ComicDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComicDataSource.swift; sourceTree = "<group>"; };
 		05C0C79A28309A61001CF997 /* RemoteComicDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteComicDataSource.swift; sourceTree = "<group>"; };
 		05C0C79D28309A6A001CF997 /* URLSessionNetworkClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLSessionNetworkClient.swift; sourceTree = "<group>"; };
@@ -213,7 +213,7 @@
 			isa = PBXGroup;
 			children = (
 				05C0C79528309A59001CF997 /* ComicRepository.swift */,
-				05C0C79628309A59001CF997 /* ReadOnlyComicRepository.swift */,
+				05C0C79628309A59001CF997 /* ConcreteComicRepository.swift */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -388,7 +388,7 @@
 				05C0C7B62832C07C001CF997 /* LocalComicDataSource.swift in Sources */,
 				05C0C7A82831D7D1001CF997 /* ComicListViewModel.swift in Sources */,
 				05E9C8D02830982E00698276 /* MainView.swift in Sources */,
-				05C0C79828309A59001CF997 /* ReadOnlyComicRepository.swift in Sources */,
+				05C0C79828309A59001CF997 /* ConcreteComicRepository.swift in Sources */,
 				05C0C79C28309A61001CF997 /* RemoteComicDataSource.swift in Sources */,
 				05C0C7AE28320681001CF997 /* ComicDetailView.swift in Sources */,
 				05C0C79728309A59001CF997 /* ComicRepository.swift in Sources */,

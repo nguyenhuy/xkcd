@@ -39,7 +39,7 @@ struct SingleFetchResult {
     let nextFetchBookmark: FetchBookmark?
 }
 
-class RemoteComicDataSource : ComicDataSource {
+class RemoteComicDataSource : ImmutableComicDataSource {
     let networkClient: NetworkClient
     let decoder: JSONDecoder
     let apiHost: String

@@ -8,14 +8,14 @@
 import Foundation
 import Combine
 
-class ReadOnlyComicRepository : ComicRepository {
+class ConcreteComicRepository : ComicRepository {
     @Published var comics = [Comic]()
     var comicsPublisher: Published<[Comic]>.Publisher { $comics }
     
     @Published var errors = [Error]()
     var errorsPublisher: Published<[Error]>.Publisher { $errors }
     
-    let dataSource: ComicDataSource
+    let dataSource: ImmutableComicDataSource
     let firstBatchSize: Int
     let normalBatchSize: Int
     
@@ -28,7 +28,7 @@ class ReadOnlyComicRepository : ComicRepository {
                   normalBatchSize: 10)
     }
     
-    init(dataSource: ComicDataSource,
+    init(dataSource: ImmutableComicDataSource,
          firstBatchSize: Int,
          normalBatchSize: Int) {
         self.dataSource = dataSource

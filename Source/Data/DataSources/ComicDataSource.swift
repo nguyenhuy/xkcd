@@ -31,16 +31,16 @@ struct BatchFetchResult {
     let nextFetchBookmark: FetchBookmark?
 }
 
-/// A data source for comics, can be remote or local
-protocol ComicDataSource {
+/// A immutable data source for comics, can be remote or local
+protocol ImmutableComicDataSource {
     
     /// Provides a publisher that can fetch the first batch of comics
+    /// - Parameter size: The size of this first batch
     /// - Returns: A publisher that delivers the first batch, as well as the bookmark for the next one.
-    /// - Returns: The size of this first batch
     func firstComics(size: Int) -> AnyPublisher<BatchFetchResult, Error>
     
     /// Provides a publisher that can fetch multiple comics at once
-    /// - Returns: A publisher that delivers a batch of comics, as well as the bookmark for the next one.
     /// - Parameter params: Parameters for the fetch.
+    /// - Returns: A publisher that delivers a batch of comics, as well as the bookmark for the next one.
     func comics(withParams params: BatchFetchParams) -> AnyPublisher<BatchFetchResult, Error>
 }

@@ -12,7 +12,7 @@ struct xkcdApp: App {
     let latestComicsRepository: ComicRepository
     
     init() {
-        latestComicsRepository = ReadOnlyComicRepository()
+        latestComicsRepository = ConcreteComicRepository()
     }
     
     var body: some Scene {
