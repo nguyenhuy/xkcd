@@ -25,11 +25,19 @@ struct ComicDetailView: View {
             Divider()
             Text(uiState.description)
                 .frame(maxWidth: .infinity)
-            NavigationLink(destination: ComicExplainationView(uiState: uiState)) {
-                Text("Explain!")
+            HStack {
+                Button {
+                    uiState.bookmarkAction()
+                } label: {
+                    Text("Bookmark")
+                }.disabled(uiState.isBookmarked)
+                Spacer()
+                NavigationLink(destination: ComicExplainationView(uiState: uiState)) {
+                    Text("Explain!")
+                }
             }
-            .padding()
             .frame(maxWidth: .infinity)
+            .padding()
         }
         .padding()
         .navigationBarTitle(Text(uiState.title),

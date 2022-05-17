@@ -14,6 +14,8 @@ struct ComicItemUIState: Identifiable {
     let imageURL: URL
     let description: String
     let explainationURL: URL
+    let isBookmarked: Bool
+    let bookmarkAction: (() -> Void)
 }
 
 struct ComicListUIState {

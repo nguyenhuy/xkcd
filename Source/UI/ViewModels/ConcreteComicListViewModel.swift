@@ -23,7 +23,27 @@ class ConcreteComicListViewModel: ComicListViewModel {
                                      title: comic.title,
                                      imageURL: comic.imageURL,
                                      description: comic.alternativeText,
-                                     explainationURL: URL(string: "https://www.explainxkcd.com/wiki/index.php/\(comic.id)")!)
+                                     explainationURL: URL(string: "https://www.explainxkcd.com/wiki/index.php/\(comic.id)")!,
+                                     isBookmarked: false,
+                                     bookmarkAction: {[weak self] in
+                        _ = self?.repository.bookmark(comic: comic)
+                    })
+                }
+            })
+            .map({ states -> [ComicItemUIState] in
+                states.map { state in
+                    var updatedState = state
+                    _ = self.repository.isComicBookmarked(comicId: state.id)
+                        .sink { isBookmarked in
+                            updatedState = ComicItemUIState(id: state.id,
+                                                            title: state.title,
+                                                            imageURL: state.imageURL,
+                                                            description: state.description,
+                                                            explainationURL: state.explainationURL,
+                                                            isBookmarked: isBookmarked,
+                                                            bookmarkAction: state.bookmarkAction)
+                        }
+                    return updatedState
                 }
             })
             .map({[weak self] comicItemStates in
