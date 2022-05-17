@@ -34,7 +34,8 @@ class LocalComicDataSource: MutableComicDataSource {
     
     func firstComics(size: Int) -> AnyPublisher<BatchFetchResult, Error> {
         let firstBatchBookmark = LocalFetchBookmark(rawValue: 0)
-        return comics(withParams: BatchFetchParams(bookmark: firstBatchBookmark, batchSize: size))
+        return comics(withParams: BatchFetchParams(bookmark: firstBatchBookmark,
+                                                   batchSize: size))
     }
     
     func comics(withParams params: BatchFetchParams) -> AnyPublisher<BatchFetchResult, Error> {
@@ -42,14 +43,16 @@ class LocalComicDataSource: MutableComicDataSource {
             return Fail(error: CancellationError()).eraseToAnyPublisher()
         }
         
-        let validBatchSize = bookmark.validBatchSize(totalCount: comics.count, requestedBatchSize: params.batchSize)
+        let validBatchSize = bookmark.validBatchSize(totalCount: comics.count,
+                                                     requestedBatchSize: params.batchSize)
         guard validBatchSize > 0 else {
             return Fail(error: CancellationError()).eraseToAnyPublisher()
         }
         
         let startingIdx = bookmark.rawValue
         let resultingComics = Array(comics[startingIdx..<startingIdx + validBatchSize])
-        let nextBookmark = bookmark.nextFetchBookmark(currentBatchCount: validBatchSize, totalCount: comics.count)
+        let nextBookmark = bookmark.nextFetchBookmark(currentBatchCount: validBatchSize,
+                                                      totalCount: comics.count)
         let result = BatchFetchResult(comics: resultingComics,
                                       nextFetchBookmark: nextBookmark)
         return Result.success(result).publisher.eraseToAnyPublisher()
