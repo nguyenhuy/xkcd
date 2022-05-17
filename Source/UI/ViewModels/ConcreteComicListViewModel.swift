@@ -34,6 +34,7 @@ class ConcreteComicListViewModel: ComicListViewModel {
     
     private func buildUIState(from comicsPublisher: Published<[Comic]>.Publisher) {
         comicsCancellable = comicsPublisher.map { comics in
+            // First, create item UI states without isBookmarked flag
             comics.map {[weak self] comic in
                 ComicItemUIState(id: comic.id,
                                  title: comic.title,
@@ -45,6 +46,9 @@ class ConcreteComicListViewModel: ComicListViewModel {
             }
         }
         .map { states -> [ComicItemUIState] in
+            // Then fill the isBookmarked flag in
+            // This transformation reaches out to the backing repo multiple times
+            // and can be slow if the repo doesn't return the results fast enough.
             states.map {[weak self] state in
                 var updatedState = state
                 _ = self?.repository.isComicBookmarked(comicId: state.id)
@@ -61,6 +65,7 @@ class ConcreteComicListViewModel: ComicListViewModel {
             }
         }
         .map {[weak self] comicItemStates in
+            // Then bundle item states into a list UI state
             guard let self = self else { return ComicListUIState(itemStates: [], errors: [], hasMore: false) }
             
             let errors = self.uiState.errors
@@ -93,10 +98,11 @@ class ConcreteComicListViewModel: ComicListViewModel {
         })
     }
     
-    private func bookmarkAction(for comic: Comic) -> (() -> Void){
+    private func bookmarkAction(for comic: Comic) -> (() -> Void) {
         return {[weak self] in
             _ = self?.repository.bookmark(comic: comic)
-                .sink(receiveCompletion: { _ in }, receiveValue: {[weak self] success in
+                .sink(receiveCompletion: { _ in },
+                      receiveValue: {[weak self] success in
                     guard success, let self = self else { return }
                     // Rebuild UI state
                     self.buildUIState(from: self.repository.comicsPublisher)

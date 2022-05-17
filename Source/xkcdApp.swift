@@ -23,7 +23,8 @@ struct xkcdApp: App {
         
         bookmarkedComicRepository = ConcreteComicRepository(comicDataSource: bookmarksDataSource,
                                                             bookmarkedComicDataSource: bookmarksDataSource,
-                                                            firstBatchSize: 10, normalBatchSize: 20)
+                                                            firstBatchSize: 10,
+                                                            normalBatchSize: 20)
     }
     
     var body: some Scene {
