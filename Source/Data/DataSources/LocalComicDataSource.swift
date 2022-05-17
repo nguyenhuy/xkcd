@@ -30,10 +30,6 @@ class LocalComicDataSource: MutableComicDataSource {
     var comics = [Comic]()
     
     func prewarm() {
-        comics.append(contentsOf: [Comic(id: 2620,
-                                         title: "Test",
-                                         imageURL: URL(string: "http://dummy.com")!,
-                                         alternativeText: "Test test")])
     }
     
     func firstComics(size: Int) -> AnyPublisher<BatchFetchResult, Error> {
@@ -72,10 +68,6 @@ class LocalComicDataSource: MutableComicDataSource {
     }
     
     func refresh() {
-        comics.append(contentsOf: [Comic(id: 2620,
-                                         title: "Test",
-                                         imageURL: URL(string: "http://dummy.com")!,
-                                         alternativeText: "Test test")])
     }
     
 }
