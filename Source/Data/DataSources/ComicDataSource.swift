@@ -43,4 +43,16 @@ protocol ImmutableComicDataSource {
     /// - Parameter params: Parameters for the fetch.
     /// - Returns: A publisher that delivers a batch of comics, as well as the bookmark for the next one.
     func comics(withParams params: BatchFetchParams) -> AnyPublisher<BatchFetchResult, Error>
+    
+    /// Provides a publisher that can answer whether the data source contains a given comic
+    /// - Parameter comicWithId: id of the comic to check
+    /// - Returns: A publisher that delivers the answer
+    func contains(comicWithId id: Int) -> AnyPublisher<Bool, Never>
+}
+
+protocol MutableComicDataSource: ImmutableComicDataSource {
+    
+    /// Adds the comics to the end of the data source
+    /// - Parameter comics: The comics to append
+    func append(comics: [Comic])
 }

@@ -123,6 +123,10 @@ class RemoteComicDataSource : ImmutableComicDataSource {
             .eraseToAnyPublisher()
     }
     
+    func contains(comicWithId id: Int) -> AnyPublisher<Bool, Never> {
+        return comic(withId: id).map { _ in true}.replaceError(with: false).eraseToAnyPublisher()
+    }
+    
     private func latestComic() -> AnyPublisher<SingleFetchResult, Error> {
         guard let url = URL(string: apiHost + infoPath) else {
             return Fail(error: URLError(.badServerResponse)).eraseToAnyPublisher()
