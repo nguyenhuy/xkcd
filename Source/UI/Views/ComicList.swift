@@ -28,6 +28,7 @@ struct ComicRow: View {
 
 struct ComicList<ViewModel>: View where ViewModel: ComicListViewModel {
     @ObservedObject var viewModel: ViewModel
+    let title: String
     
     var body: some View {
         NavigationView {
@@ -50,7 +51,7 @@ struct ComicList<ViewModel>: View where ViewModel: ComicListViewModel {
             .refreshable {
                 viewModel.refresh()
             }
-            .navigationTitle(Text("Latest"))
+            .navigationTitle(Text(title))
         }
     }
 }

@@ -13,11 +13,11 @@ struct MainView<ListViewModel>: View where ListViewModel: ComicListViewModel {
 
     var body: some View {
         TabView {
-            ComicList(viewModel: latestComicListViewModel).tabItem() {
+            ComicList(viewModel: latestComicListViewModel, title: "Latest").tabItem() {
                 Text("Latest Feed")
                 Image(systemName: "house")
             }
-            ComicList(viewModel: bookmarkedComicListViewModel).tabItem() {
+            ComicList(viewModel: bookmarkedComicListViewModel, title: "Bookmarks").tabItem() {
                 Text("Bookmarks")
                 Image(systemName: "bookmark")
             }
