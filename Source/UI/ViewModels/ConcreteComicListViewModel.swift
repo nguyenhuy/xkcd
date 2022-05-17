@@ -11,7 +11,8 @@ import Combine
 class ConcreteComicListViewModel: ComicListViewModel {
     @Published var uiState: ComicListUIState
     private let repository: ComicRepository
-    private var cancellable: AnyCancellable?
+    private var comicsCancellable: AnyCancellable?
+    private var hasMoreCancellable: AnyCancellable?
     
     init(repository: ComicRepository) {
         self.repository = repository
@@ -20,6 +21,7 @@ class ConcreteComicListViewModel: ComicListViewModel {
         repository.prewarm()
         
         buildUIState(from: repository.comicsPublisher)
+        buildUIState(from: repository.hasMorePublisher)
     }
     
     func fetchNextBatch() {
@@ -30,8 +32,8 @@ class ConcreteComicListViewModel: ComicListViewModel {
         repository.refresh()
     }
     
-    private func buildUIState(from publisher: Published<[Comic]>.Publisher) {
-        cancellable = publisher.map { comics in
+    private func buildUIState(from comicsPublisher: Published<[Comic]>.Publisher) {
+        comicsCancellable = comicsPublisher.map { comics in
             comics.map {[weak self] comic in
                 ComicItemUIState(id: comic.id,
                                  title: comic.title,
@@ -60,10 +62,27 @@ class ConcreteComicListViewModel: ComicListViewModel {
         }
         .map {[weak self] comicItemStates in
             guard let self = self else { return ComicListUIState(itemStates: [], errors: [], hasMore: false) }
-                            
+            
             let errors = self.uiState.errors
-            let hasMore = self.repository.hasMore
+            let hasMore = self.uiState.hasMore
             return ComicListUIState(itemStates: comicItemStates,
+                                    errors: errors,
+                                    hasMore: hasMore)
+        }
+        .sink(receiveCompletion: { [weak self] completion in
+            self?.objectWillChange.send()
+        }, receiveValue: { [weak self] newState in
+            self?.uiState = newState
+        })
+    }
+    
+    private func buildUIState(from hasMorePublisher: Published<Bool>.Publisher) {
+        hasMoreCancellable = hasMorePublisher.map {[weak self] hasMore in
+            guard let self = self else { return ComicListUIState(itemStates: [], errors: [], hasMore: false) }
+                
+            let itemStates = self.uiState.itemStates
+            let errors = self.uiState.errors
+            return ComicListUIState(itemStates: itemStates,
                                     errors: errors,
                                     hasMore: hasMore)
         }

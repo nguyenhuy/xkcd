@@ -15,6 +15,9 @@ class ConcreteComicRepository : ComicRepository {
     @Published var errors = [Error]()
     var errorsPublisher: Published<[Error]>.Publisher { $errors }
     
+    @Published var hasMore = false
+    var hasMorePublisher: Published<Bool>.Publisher { $hasMore }
+    
     let comicDataSource: ImmutableComicDataSource
     let bookmarkedComicDataSource: MutableComicDataSource
     let firstBatchSize: Int
@@ -23,7 +26,7 @@ class ConcreteComicRepository : ComicRepository {
     var currentFetch: AnyCancellable?
     var nextFetchBookmark: FetchBookmark?
     var didFetchFirstBatch: Bool
-    var hasMore: Bool
+    
     
     convenience init() {
         self.init(comicDataSource: RemoteComicDataSource(),
@@ -41,7 +44,6 @@ class ConcreteComicRepository : ComicRepository {
         self.firstBatchSize = firstBatchSize
         self.normalBatchSize = normalBatchSize
         didFetchFirstBatch = false
-        hasMore = true
     }
     
     func prewarm() {
@@ -132,7 +134,7 @@ class ConcreteComicRepository : ComicRepository {
         currentFetch = nil
         nextFetchBookmark = nil
         didFetchFirstBatch = false
-        hasMore = true
+        hasMore = false
         
         comics.removeAll()
         errors.removeAll()

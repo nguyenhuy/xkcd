@@ -17,9 +17,8 @@ protocol ComicRepository {
     /// A publisher that delivers errors that this repository encouters.
     var errorsPublisher: Published<[Error]>.Publisher { get }
     
-    /// Whether this repository has more comics to fetch
-    /// - Returns: true if has more, false otherwise
-    var hasMore: Bool { get set }
+    /// A publisher that delivers whether this repository has and can fetch more comics.
+    var hasMorePublisher: Published<Bool>.Publisher { get }
     
     /// Tells the repository to prime itself because it'll be asked for some comics very shortly.
     /// For examples, it can tell its data source(s) to warm up HTTP connection(s) to backend API or local file/DB.
