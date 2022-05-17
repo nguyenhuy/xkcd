@@ -49,7 +49,6 @@ class ConcreteComicListViewModel: ComicListViewModel {
     }
     
     func refresh() {
-        repository.purge()
-        repository.fetchNextBatch()
+        repository.refresh()
     }
 }

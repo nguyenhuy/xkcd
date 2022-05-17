@@ -15,7 +15,8 @@ class ConcreteComicRepository : ComicRepository {
     @Published var errors = [Error]()
     var errorsPublisher: Published<[Error]>.Publisher { $errors }
     
-    let dataSource: ImmutableComicDataSource
+    let comicDataSource: ImmutableComicDataSource
+    let bookmarkedComicDataSource: MutableComicDataSource
     let firstBatchSize: Int
     let normalBatchSize: Int
     
@@ -23,21 +24,25 @@ class ConcreteComicRepository : ComicRepository {
     var nextFetchBookmark: FetchBookmark?
     
     convenience init() {
-        self.init(dataSource: RemoteComicDataSource(),
+        self.init(comicDataSource: RemoteComicDataSource(),
+                  bookmarkedComicDataSource: LocalComicDataSource(),
                   firstBatchSize: 5,
                   normalBatchSize: 10)
     }
     
-    init(dataSource: ImmutableComicDataSource,
+    init(comicDataSource: ImmutableComicDataSource,
+         bookmarkedComicDataSource: MutableComicDataSource,
          firstBatchSize: Int,
          normalBatchSize: Int) {
-        self.dataSource = dataSource
+        self.comicDataSource = comicDataSource
+        self.bookmarkedComicDataSource = bookmarkedComicDataSource
         self.firstBatchSize = firstBatchSize
         self.normalBatchSize = normalBatchSize
     }
     
     func prewarm() {
-        dataSource.prewarm()
+        comicDataSource.prewarm()
+        bookmarkedComicDataSource.prewarm()
         fetchFirstBatch(forced: true)
     }
     
@@ -51,7 +56,7 @@ class ConcreteComicRepository : ComicRepository {
             return
         }
         
-        consume(publisher: dataSource.firstComics(size: firstBatchSize))
+        consume(publisher: comicDataSource.firstComics(size: firstBatchSize))
     }
     
     func fetchNextBatch() {
@@ -80,7 +85,7 @@ class ConcreteComicRepository : ComicRepository {
         let params = BatchFetchParams(bookmark: nextBookmark,
                                       batchSize: normalBatchSize)
         
-        consume(publisher: dataSource.comics(withParams: params))
+        consume(publisher: comicDataSource.comics(withParams: params))
     }
     
     private func consume(publisher: AnyPublisher<BatchFetchResult, Error>) {
@@ -117,10 +122,23 @@ class ConcreteComicRepository : ComicRepository {
         return !didFetchFirstBatch() || self.nextFetchBookmark != nil
     }
     
-    func purge() {
-        self.currentFetch = nil
-        self.nextFetchBookmark = nil
-        self.comics.removeAll()
-        self.errors.removeAll()
+    func isComicBookmarked(comicId id: Int) -> AnyPublisher<Bool, Never> {
+        return bookmarkedComicDataSource.contains(comicWithId: id)
+    }
+    
+    func bookmark(comic: Comic) -> AnyPublisher<Bool, Error> {
+        return bookmarkedComicDataSource.append(comics: [comic])
+    }
+    
+    func refresh() {
+        currentFetch = nil
+        nextFetchBookmark = nil
+        comics.removeAll()
+        errors.removeAll()
+        
+        comicDataSource.refresh()
+        bookmarkedComicDataSource.refresh()
+        
+        fetchFirstBatch(forced: true)
     }
 }

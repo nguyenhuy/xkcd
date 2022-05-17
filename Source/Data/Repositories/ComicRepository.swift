@@ -30,7 +30,18 @@ protocol ComicRepository {
     /// - Returns: true if has more, false otherwise
     func hasMore() -> Bool
     
-    /// Tells the repository to purge its data.
-    /// The next fetchNextBatch() will fetch the first page.
-    func purge()
+    /// Provides a publisher that can answer whether a comic is bookmarked
+    /// - Parameter comicId: id of the comic to check
+    /// - Returns: A publisher that delivers the answer
+    func isComicBookmarked(comicId id: Int) -> AnyPublisher<Bool, Never>
+    
+    /// Bookmarks a comic
+    /// - Parameter comic: The comic to bookmark
+    /// - Returns: A publisher that delivers the result of this operation
+    func bookmark(comic: Comic) -> AnyPublisher<Bool, Error>
+    
+    /// Tells the repository to refresh its data.
+    func refresh()
+    
+    
 }

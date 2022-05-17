@@ -52,11 +52,15 @@ protocol ImmutableComicDataSource {
     /// - Parameter comicWithId: id of the comic to check
     /// - Returns: A publisher that delivers the answer
     func contains(comicWithId id: Int) -> AnyPublisher<Bool, Never>
+    
+    /// Tells the data source to refresh its data.
+    func refresh()
 }
 
 protocol MutableComicDataSource: ImmutableComicDataSource {
     
     /// Adds the comics to the end of the data source
     /// - Parameter comics: The comics to append
-    func append(comics: [Comic])
+    /// - Returns: A publisher that delivers the result of this operation
+    func append(comics: [Comic]) -> AnyPublisher<Bool, Error>
 }

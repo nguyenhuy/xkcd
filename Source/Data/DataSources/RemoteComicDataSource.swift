@@ -135,6 +135,10 @@ class RemoteComicDataSource : ImmutableComicDataSource {
         return comic(withId: id).map { _ in true}.replaceError(with: false).eraseToAnyPublisher()
     }
     
+    func refresh() {
+        // This data source is stateless so there is nothing to refresh
+    }
+    
     private func latestComic() -> AnyPublisher<SingleFetchResult, Error> {
         guard let url = URL(string: apiHost + infoPath) else {
             return Fail(error: URLError(.badServerResponse)).eraseToAnyPublisher()

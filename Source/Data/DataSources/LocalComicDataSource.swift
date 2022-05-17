@@ -66,8 +66,16 @@ class LocalComicDataSource: MutableComicDataSource {
         return Result.success(contains).publisher.eraseToAnyPublisher()
     }
     
-    func append(comics: [Comic]) {
+    func append(comics: [Comic]) -> AnyPublisher<Bool, Error> {
         self.comics.append(contentsOf: comics)
+        return Result.success(true).publisher.eraseToAnyPublisher()
+    }
+    
+    func refresh() {
+        comics.append(contentsOf: [Comic(id: 2620,
+                                         title: "Test",
+                                         imageURL: URL(string: "http://dummy.com")!,
+                                         alternativeText: "Test test")])
     }
     
 }
