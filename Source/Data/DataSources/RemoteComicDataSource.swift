@@ -64,8 +64,23 @@ class RemoteComicDataSource : ImmutableComicDataSource {
     }
     
     func firstComics(size: Int) -> AnyPublisher<BatchFetchResult, Error> {
+        guard size > 0 else {
+            return Fail(error: CancellationError()).eraseToAnyPublisher()
+        }
+        
+        guard size > 1 else {
+            return latestComic()
+                .map({ result in
+                    BatchFetchResult(comics: [result.comic],
+                                     nextFetchBookmark: result.nextFetchBookmark)
+                })
+                .eraseToAnyPublisher()
+        }
+        
+        // First, fetch the latest comic
         return latestComic()
             .map { [weak self] result -> AnyPublisher<BatchFetchResult, Error> in
+                // Got the latest comic, turn it into a "batch" to "zip" later on
                 let firstBatch = BatchFetchResult(comics: [result.comic], nextFetchBookmark: nil)
                 let firstBatchPublisher = Result<BatchFetchResult, Error>.success(firstBatch)
                     .publisher
@@ -74,8 +89,11 @@ class RemoteComicDataSource : ImmutableComicDataSource {
                     return firstBatchPublisher
                 }
                 
-                let nextBatchPublisher = self.comics(withParams: BatchFetchParams(bookmark: bookmark, batchSize: size - 1))
+                // Fetch remaining ones
+                let nextBatchPublisher = self.comics(withParams: BatchFetchParams(bookmark: bookmark,
+                                                                                  batchSize: size - 1))
                 
+                // Zip the results
                 return Publishers.Zip(firstBatchPublisher, nextBatchPublisher)
                     .map { (first, next) in
                         BatchFetchResult(comics: first.comics + next.comics,
@@ -117,16 +135,19 @@ class RemoteComicDataSource : ImmutableComicDataSource {
         return Publishers.MergeMany(publishers)
             .collect()
             .tryMap({ results in
-                let sortedResults = results.sorted { a, b in
-                    a.comic.id > b.comic.id
-                }
-                
-                guard results.count == batchSize, let last = sortedResults.last else {
+                guard results.count == batchSize else {
+                    // Get fewer comics than requested
+                    // Can't return any of them because they may not be continuous
                     throw URLError(.badServerResponse)
                 }
                 
-                return BatchFetchResult(comics: sortedResults.map { $0.comic },
-                                        nextFetchBookmark: last.nextFetchBookmark)
+                // results aren't in any particular order so we need to sort it
+                let comics = results
+                    .map { $0.comic }
+                    .sorted { $0.id > $1.id }
+                let nextBookmark = bookmark.nextFetchBookmark(currentBatchCount: results.count)
+                return BatchFetchResult(comics: comics,
+                                        nextFetchBookmark: nextBookmark)
             })
             .eraseToAnyPublisher()
     }
