@@ -58,9 +58,11 @@ class ConcreteComicListViewModel: ComicListViewModel {
                 return updatedState
             }
         }
-        .map { comicItemStates in
+        .map {[weak self] comicItemStates in
+            guard let self = self else { return ComicListUIState(itemStates: [], errors: [], hasMore: false) }
+                            
             let errors = self.uiState.errors
-            let hasMore = self.repository.hasMore()
+            let hasMore = self.repository.hasMore
             return ComicListUIState(itemStates: comicItemStates,
                                     errors: errors,
                                     hasMore: hasMore)

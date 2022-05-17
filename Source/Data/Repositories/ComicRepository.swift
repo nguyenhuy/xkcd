@@ -17,6 +17,10 @@ protocol ComicRepository {
     /// A publisher that delivers errors that this repository encouters.
     var errorsPublisher: Published<[Error]>.Publisher { get }
     
+    /// Whether this repository has more comics to fetch
+    /// - Returns: true if has more, false otherwise
+    var hasMore: Bool { get set }
+    
     /// Tells the repository to prime itself because it'll be asked for some comics very shortly.
     /// For examples, it can tell its data source(s) to warm up HTTP connection(s) to backend API or local file/DB.
     func prewarm()
@@ -25,10 +29,6 @@ protocol ComicRepository {
     /// Calling this method when the repository is empty will cause it to fetch the first batch.
     /// Calling this method while a batch if fetch is already inflight will do nothing.
     func fetchNextBatch()
-    
-    /// Whether this repository has more comics to fetch
-    /// - Returns: true if has more, false otherwise
-    func hasMore() -> Bool
     
     /// Provides a publisher that can answer whether a comic is bookmarked
     /// - Parameter comicId: id of the comic to check

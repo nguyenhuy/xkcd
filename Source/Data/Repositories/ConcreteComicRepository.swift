@@ -22,6 +22,8 @@ class ConcreteComicRepository : ComicRepository {
     
     var currentFetch: AnyCancellable?
     var nextFetchBookmark: FetchBookmark?
+    var didFetchFirstBatch: Bool
+    var hasMore: Bool
     
     convenience init() {
         self.init(comicDataSource: RemoteComicDataSource(),
@@ -38,6 +40,8 @@ class ConcreteComicRepository : ComicRepository {
         self.bookmarkedComicDataSource = bookmarkedComicDataSource
         self.firstBatchSize = firstBatchSize
         self.normalBatchSize = normalBatchSize
+        didFetchFirstBatch = false
+        hasMore = true
     }
     
     func prewarm() {
@@ -51,7 +55,7 @@ class ConcreteComicRepository : ComicRepository {
             return
         }
         
-        guard self.didFetchFirstBatch() == false else {
+        guard !didFetchFirstBatch else {
             // Make sure to not fetch first batch repeatedly
             return
         }
@@ -65,12 +69,12 @@ class ConcreteComicRepository : ComicRepository {
             return
         }
         
-        guard self.hasMore() else {
+        guard hasMore else {
             // Data source ran out of comics
             return
         }
         
-        guard self.didFetchFirstBatch() else {
+        guard didFetchFirstBatch else {
             // Make sure to fetch first batch first
             self.fetchFirstBatch()
             return
@@ -107,19 +111,13 @@ class ConcreteComicRepository : ComicRepository {
                 
                 self.comics.append(contentsOf: result.comics)
                 self.nextFetchBookmark = result.nextFetchBookmark
+                self.didFetchFirstBatch = true
+                self.hasMore = self.nextFetchBookmark != nil
             })
     }
     
     private func isFetching() -> Bool {
         return self.currentFetch != nil
-    }
-    
-    private func didFetchFirstBatch() -> Bool {
-        return self.nextFetchBookmark != nil && !self.comics.isEmpty
-    }
-    
-    func hasMore() -> Bool {
-        return !didFetchFirstBatch() || self.nextFetchBookmark != nil
     }
     
     func isComicBookmarked(comicId id: Int) -> AnyPublisher<Bool, Never> {
@@ -133,6 +131,9 @@ class ConcreteComicRepository : ComicRepository {
     func refresh() {
         currentFetch = nil
         nextFetchBookmark = nil
+        didFetchFirstBatch = false
+        hasMore = true
+        
         comics.removeAll()
         errors.removeAll()
         
