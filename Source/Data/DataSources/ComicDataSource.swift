@@ -34,6 +34,10 @@ struct BatchFetchResult {
 /// A immutable data source for comics, can be remote or local
 protocol ImmutableComicDataSource {
     
+    /// Tells the repository to prime itself because it'll be asked for some comics very shortly.
+    /// For examples, it can tell its data source(s) to warm up HTTP connection(s) to backend API or local file/DB.
+    func prewarm()
+    
     /// Provides a publisher that can fetch the first batch of comics
     /// - Parameter size: The size of this first batch
     /// - Returns: A publisher that delivers the first batch, as well as the bookmark for the next one.

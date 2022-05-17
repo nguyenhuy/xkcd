@@ -18,7 +18,7 @@ protocol ComicRepository {
     var errorsPublisher: Published<[Error]>.Publisher { get }
     
     /// Tells the repository to prime itself because it'll be asked for some comics very shortly.
-    /// For examples, it can warming a HTTP connection to backend API, or open a file/DB connection.
+    /// For examples, it can tell its data source(s) to warm up HTTP connection(s) to backend API or local file/DB.
     func prewarm()
     
     /// Asks the repository to fetch the next batch of comics

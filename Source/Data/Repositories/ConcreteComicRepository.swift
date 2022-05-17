@@ -37,7 +37,8 @@ class ConcreteComicRepository : ComicRepository {
     }
     
     func prewarm() {
-        self.fetchFirstBatch(forced: true)
+        dataSource.prewarm()
+        fetchFirstBatch(forced: true)
     }
     
     private func fetchFirstBatch(forced: Bool = false) {

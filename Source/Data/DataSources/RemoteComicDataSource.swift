@@ -59,6 +59,10 @@ class RemoteComicDataSource : ImmutableComicDataSource {
                   infoPath: "/info.0.json")
     }
     
+    func prewarm() {
+        // TODO: Maybe ask the network client to make a dummy request to warm up its connection?
+    }
+    
     func firstComics(size: Int) -> AnyPublisher<BatchFetchResult, Error> {
         return latestComic()
             .map { [weak self] result -> AnyPublisher<BatchFetchResult, Error> in
