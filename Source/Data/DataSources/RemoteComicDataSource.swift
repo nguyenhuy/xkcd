@@ -24,7 +24,7 @@ struct xkcdFetchBookmark : FetchBookmark {
     }
     
     func validBatchSize(requestedBatchSize: Int) -> Int {
-        return min(self.rawValue - xkcdFetchBookmark.MIN + 1, requestedBatchSize)
+        return max(0, min(self.rawValue - xkcdFetchBookmark.MIN + 1, requestedBatchSize))
     }
 }
 
@@ -94,6 +94,10 @@ class RemoteComicDataSource : ImmutableComicDataSource {
         
         let startingId = bookmark.rawValue
         let batchSize = bookmark.validBatchSize(requestedBatchSize: params.batchSize)
+        
+        guard batchSize > 0 else {
+            return Fail(error: CancellationError()).eraseToAnyPublisher()
+        }
         
         guard batchSize > 1 else {
             return self.comic(withId: startingId)
